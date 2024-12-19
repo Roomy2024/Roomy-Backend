@@ -1,4 +1,4 @@
-package Map.Domain;
+package Map.Entity;
 
 public class Map {
 }
