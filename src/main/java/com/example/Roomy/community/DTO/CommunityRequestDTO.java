@@ -1,5 +1,6 @@
-package community.domain;
+package com.example.Roomy.community.DTO;
 
+import com.example.Roomy.community.entity.CommunityEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

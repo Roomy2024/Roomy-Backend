@@ -1,11 +1,10 @@
-package community.domain;
+package com.example.Roomy.community.entity;
 
+import com.example.Roomy.community.DTO.CommunityResponseDTO;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
@@ -14,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "community")
+@Table(name = "com/example/Roomy/community")
 public class CommunityEntity {
 
     @Id

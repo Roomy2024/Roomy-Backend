@@ -1,9 +1,9 @@
-package community.service;
+package com.example.Roomy.community.service;
 
-import community.domain.CommunityEntity;
-import community.domain.CommunityRequestDTO;
-import community.domain.CommunityResponseDTO;
-import community.dao.CommunityRepository;
+import com.example.Roomy.community.entity.CommunityEntity;
+import com.example.Roomy.community.DTO.CommunityRequestDTO;
+import com.example.Roomy.community.DTO.CommunityResponseDTO;
+import com.example.Roomy.community.Repository.CommunityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

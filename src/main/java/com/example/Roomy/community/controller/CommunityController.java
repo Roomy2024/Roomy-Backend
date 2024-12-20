@@ -1,8 +1,8 @@
-package community.controller;
+package com.example.Roomy.community.controller;
 
-import community.domain.CommunityRequestDTO;
-import community.domain.CommunityResponseDTO;
-import community.service.CommunityService;
+import com.example.Roomy.community.DTO.CommunityRequestDTO;
+import com.example.Roomy.community.DTO.CommunityResponseDTO;
+import com.example.Roomy.community.service.CommunityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

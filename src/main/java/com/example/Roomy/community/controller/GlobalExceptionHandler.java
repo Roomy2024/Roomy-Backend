@@ -1,4 +1,4 @@
-package community.controller;
+package com.example.Roomy.community.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

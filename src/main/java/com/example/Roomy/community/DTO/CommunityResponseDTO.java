@@ -1,4 +1,4 @@
-package community.domain;
+package com.example.Roomy.community.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

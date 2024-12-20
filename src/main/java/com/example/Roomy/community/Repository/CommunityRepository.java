@@ -1,6 +1,6 @@
-package community.dao;
+package com.example.Roomy.community.Repository;
 
-import community.domain.CommunityEntity;
+import com.example.Roomy.community.entity.CommunityEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
