@@ -34,3 +34,40 @@ Tag : #1 <br/>
 #5 : Rename ( 파일 및 폴더 명 수정하거나 옮기는 작업만 있는 경우 )<br/>
 #6 : Remove ( 파일을 삭제한 경우만 있는 경우 )<br/>
 #7 : Fixes ( 이슈 수정중 )<br/>
+
+
+---
+
+### Mysql 연결 코드 기본
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.datasource.url=jdbc:mysql://[IP]:[포트번호]/[DB이름]?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul
+spring.datasource.username=[본인계정이름]
+spring.datasource.password=[본인계정비밀번호]
+
+#true 설정 시 jpa 쿼리문 확인 가능
+spring.jpa.show-sql=true
+
+#DDL 정의시 DB의 고유 기능을 사용 가능
+spring.jpa.hibernate.ddl-auto=update
+
+# JPA의 구현체인 Hibernate가 동작하면서 발생한 SQL의 가독성을 높여줌
+spring.jpa.properties.hibernate.format_sql=true
+
+
+---
+
+### 프로젝트 Mysql 연결 코드 (로컬로)
+#Mysql 설정 Local
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.datasource.url=jdbc:mysql://127.0.0.1:3306/roomy?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul
+spring.datasource.username=root
+spring.datasource.password=1234
+
+#true 설정 시 jpa 쿼리문 확인 가능
+spring.jpa.show-sql=true
+
+#DDL 정의시 DB의 고유 기능을 사용 가능
+spring.jpa.hibernate.ddl-auto=update
+
+# JPA의 구현체인 Hibernate가 동작하면서 발생한 SQL의 가독성을 높여줌
+spring.jpa.properties.hibernate.format_sql=true
