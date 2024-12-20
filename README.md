@@ -39,6 +39,7 @@ Tag : #1 <br/>
 ---
 
 ### Mysql 연결 코드 기본 <br/>
+```
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver <br/>
 spring.datasource.url=jdbc:mysql://[IP]:[포트번호]/[DB이름]?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul <br/>
 spring.datasource.username=[본인계정이름] <br/> 
@@ -52,12 +53,13 @@ spring.jpa.hibernate.ddl-auto=update <br/>
 
  JPA의 구현체인 Hibernate가 동작하면서 발생한 SQL의 가독성을 높여줌 <br/>
 spring.jpa.properties.hibernate.format_sql=true <br/>
-
+```
 
 ---
 
 ### 프로젝트 Mysql 연결 코드 (로컬로) <br/>
 Mysql 설정 Local <br/>
+```
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver <br/>
 spring.datasource.url=jdbc:mysql://127.0.0.1:3306/roomy?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul <br/>
 spring.datasource.username=root <br/>
@@ -71,3 +73,4 @@ spring.jpa.hibernate.ddl-auto=update<br/>
 
 JPA의 구현체인 Hibernate가 동작하면서 발생한 SQL의 가독성을 높여줌<br/>
 spring.jpa.properties.hibernate.format_sql=true<br/>
+```
