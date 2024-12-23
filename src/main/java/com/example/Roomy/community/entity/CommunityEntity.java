@@ -1,19 +1,22 @@
 package com.example.Roomy.community.entity;
 
-import com.example.Roomy.community.DTO.CommunityResponseDTO;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "com/example/Roomy/community")
+@Table(name = "community")
 public class CommunityEntity {
 
     @Id
@@ -48,24 +51,4 @@ public class CommunityEntity {
     @Comment("수정 시간")
     private LocalDateTime updatedAt;
 
-    // DTO 변환 메서드 (작성자 관련 코드 주석 처리)
-    public CommunityResponseDTO toResponseDTO() {
-        return CommunityResponseDTO.builder()
-                .communityId(this.communityId)
-                .title(this.title)
-                .content(this.content)
-                .type(this.type)
-                // .author(this.author != null ? this.author.getUsername() : null) // 작성자 이름 추가 가능
-                .createdAt(this.createdAt)
-                .updatedAt(this.updatedAt)
-                .build();
-    }
-
-    // 업데이트 메서드
-    public void update(String title, String content, String type) {
-        this.title = title;
-        this.content = content;
-        this.type = type;
-        this.updatedAt = LocalDateTime.now();
-    }
 }
