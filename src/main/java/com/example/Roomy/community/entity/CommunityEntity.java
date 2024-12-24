@@ -1,14 +1,13 @@
 package com.example.Roomy.community.entity;
 
+import com.example.Roomy.image.entity.FileGroupEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -24,11 +23,13 @@ public class CommunityEntity {
     @Comment("게시판 번호")
     private Long communityId;
 
-    // 작성자 필드 추가 (유저 엔티티 생성 시 사용)
-    // @Comment("작성자")
-    // @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    // @OnDelete(action = OnDeleteAction.CASCADE)
-    // private User author;
+    @CreationTimestamp
+    @Comment("작성 시간")
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Comment("수정 시간")
+    private LocalDateTime updatedAt;
 
     @Column(nullable = false)
     @Comment("제목")
@@ -42,13 +43,7 @@ public class CommunityEntity {
     @Comment("커뮤니티 타입")
     private String type;
 
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false)
-    @Comment("작성 시간")
-    private LocalDateTime createdAt;
-
-    @CreationTimestamp
-    @Comment("수정 시간")
-    private LocalDateTime updatedAt;
-
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "file_group_id")
+    private FileGroupEntity fileGroupEntity;
 }
