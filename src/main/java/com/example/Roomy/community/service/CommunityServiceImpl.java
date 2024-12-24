@@ -75,14 +75,18 @@ public class CommunityServiceImpl implements CommunityService {
         if (fileGroup.getImages() != null && !fileGroup.getImages().isEmpty()) {
             List<ImageEntity> existingImages = new ArrayList<>(fileGroup.getImages());
             for (ImageEntity image : existingImages) {
-                String localPath = "C:/uploads/" + image.getImageUrl().substring("/uploads/".length());
+                String localPath = "/Roomy-Backend/uploads/" + image.getImageUrl().substring("/Roomy-Backend/uploads/".length());
 
                 // 로컬 디스크 파일 삭제
-                boolean isFileDeleted = Files.deleteIfExists(Paths.get(localPath));
-                if (isFileDeleted) {
-                    System.out.println("파일 삭제 성공: " + localPath);
-                } else {
-                    System.out.println("파일 삭제 실패 또는 존재하지 않음: " + localPath);
+                try {
+                    boolean isFileDeleted = Files.deleteIfExists(Paths.get(localPath));
+                    if (isFileDeleted) {
+                        System.out.println("파일 삭제 성공: " + localPath);
+                    } else {
+                        System.out.println("파일 삭제 실패 또는 존재하지 않음: " + localPath);
+                    }
+                } catch (IOException e) {
+                    System.err.println("파일 삭제 중 오류 발생: " + e.getMessage());
                 }
 
                 // 데이터베이스에서 이미지 삭제
@@ -95,19 +99,28 @@ public class CommunityServiceImpl implements CommunityService {
         // 새로운 이미지 추가
         if (communityRequestDTO.getImages() != null && !communityRequestDTO.getImages().isEmpty()) {
             for (MultipartFile file : communityRequestDTO.getImages()) {
-                String filePath = fileService.saveFile(file);
-                ImageEntity imageEntity = ImageEntity.builder()
-                        .imageUrl(filePath)
-                        .fileGroup(fileGroup)
-                        .build();
-                fileGroup.getImages().add(imageEntity);
+                try {
+                    String filePath = fileService.saveFile(file); // 파일 저장
+                    ImageEntity imageEntity = ImageEntity.builder()
+                            .imageUrl(filePath)
+                            .fileGroup(fileGroup)
+                            .build();
+                    fileGroup.getImages().add(imageEntity); // 이미지 엔티티 추가
+                    System.out.println("새로운 이미지 저장 성공: " + filePath);
+                } catch (IOException e) {
+                    System.err.println("새로운 이미지 저장 실패: " + file.getOriginalFilename() + ", 오류: " + e.getMessage());
+                }
             }
+        } else {
+            System.out.println("새로운 이미지가 제공되지 않았습니다.");
         }
 
         // 엔티티 저장 및 응답 반환
-        communityRepository.save(communityEntity);
-        return toResponseDTO(communityEntity);
+        CommunityEntity savedEntity = communityRepository.save(communityEntity);
+        System.out.println("커뮤니티 수정 성공: communityId=" + savedEntity.getCommunityId());
+        return toResponseDTO(savedEntity);
     }
+
 
 
 
@@ -138,7 +151,7 @@ public class CommunityServiceImpl implements CommunityService {
         if (fileGroup != null && fileGroup.getImages() != null) {
             for (ImageEntity image : fileGroup.getImages()) {
                 try {
-                    String localPath = "C:/uploads/" + image.getImageUrl().substring("/uploads/".length());
+                    String localPath = "/Roomy-Backend/uploads/" + image.getImageUrl().substring("/Roomy-Backend/uploads/".length());
                     boolean isFileDeleted = Files.deleteIfExists(Paths.get(localPath));
                     if (isFileDeleted) {
                         System.out.println("파일 삭제 성공: " + localPath);
