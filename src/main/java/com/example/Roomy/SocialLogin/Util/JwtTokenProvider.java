@@ -20,7 +20,7 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    private final String SECRET_KEY = "1234!";
+    private final String SECRET_KEY = "your-very-strong-secret-key-with-at-least-256-bits!";
     private final long EXPIRATION_TIME = 1;
 
 

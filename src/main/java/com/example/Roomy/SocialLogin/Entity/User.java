@@ -1,7 +1,6 @@
 package com.example.Roomy.SocialLogin.Entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,8 +10,8 @@ import lombok.NoArgsConstructor;
 public class User {
 
     //DB 연결 후 수정
-    //@ID
-    //GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(nullable = false)
