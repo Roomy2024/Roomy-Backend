@@ -15,6 +15,7 @@ public class CommunityResponseDTO {
     private String title;
     private String content;
     private String type;
+    private int views;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<String> imageUrls;

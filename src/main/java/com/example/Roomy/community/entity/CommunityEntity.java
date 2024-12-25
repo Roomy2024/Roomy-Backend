@@ -46,4 +46,7 @@ public class CommunityEntity {
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "file_group_id")
     private FileGroupEntity fileGroupEntity;
+
+    @Column(nullable = false)
+    private int views = 0;
 }

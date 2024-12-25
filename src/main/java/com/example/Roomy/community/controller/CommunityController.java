@@ -29,6 +29,7 @@ public class CommunityController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CommunityResponseDTO> getCommunity(@PathVariable Long id) {
+        communityService.increaseViewCount(id);
         return ResponseEntity.ok(communityService.getCommunity(id));
     }
 
@@ -37,7 +38,7 @@ public class CommunityController {
         return ResponseEntity.ok(communityService.getAllCommunities());
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("delete/{id}")
     public ResponseEntity<String> deleteCommunity(@PathVariable Long id) {
         String message = communityService.deleteCommunity(id);
         return ResponseEntity.ok(message);

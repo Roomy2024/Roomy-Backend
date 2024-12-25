@@ -50,6 +50,7 @@ public class CommunityServiceImpl implements CommunityService {
         }
         communityEntity.setFileGroupEntity(fileGroup);
         communityRepository.save(communityEntity);
+        System.out.println("게시글 생성 완료. 게시글 아이디 : " + communityEntity.getCommunityId());
 
         return toResponseDTO(communityEntity);
     }
@@ -122,9 +123,6 @@ public class CommunityServiceImpl implements CommunityService {
     }
 
 
-
-
-
     @Override
     public CommunityResponseDTO getCommunity(Long id) {
         CommunityEntity communityEntity = communityRepository.findById(id)
@@ -172,6 +170,12 @@ public class CommunityServiceImpl implements CommunityService {
         return "게시글이 성공적으로 삭제되었습니다. 게시글 ID: " + id;
     }
 
+    @Override
+    @Transactional
+    public void increaseViewCount(Long id){
+        communityRepository.increaseViewCount(id);
+        System.out.println("조회수가 증가 한 게시글 아이디 : " + id);
+    }
 
     private CommunityResponseDTO toResponseDTO(CommunityEntity communityEntity) {
         List<String> imageUrls = communityEntity.getFileGroupEntity().getImages().stream()
@@ -185,7 +189,10 @@ public class CommunityServiceImpl implements CommunityService {
                 .type(communityEntity.getType())
                 .createdAt(communityEntity.getCreatedAt())
                 .updatedAt(communityEntity.getUpdatedAt())
+                .views(communityEntity.getViews())
                 .imageUrls(imageUrls)
                 .build();
     }
+
+
 }

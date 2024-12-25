@@ -12,4 +12,5 @@ public interface CommunityService {
     CommunityResponseDTO getCommunity(Long id);
     List<CommunityResponseDTO> getAllCommunities();
     String deleteCommunity(Long id);
+    public void increaseViewCount(Long id);
 }
