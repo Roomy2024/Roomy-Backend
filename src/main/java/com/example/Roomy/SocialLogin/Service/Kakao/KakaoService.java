@@ -1,14 +1,12 @@
 package com.example.Roomy.SocialLogin.Service.Kakao;
 
 import com.example.Roomy.SocialLogin.Dto.Kakao.KakaoAccessTokenResponse;
+import com.example.Roomy.SocialLogin.Dto.Kakao.KakaoUserResponse;
 import com.example.Roomy.SocialLogin.Entity.Response.UserResponse;
 import com.example.Roomy.SocialLogin.Entity.User;
 import com.example.Roomy.SocialLogin.Repository.UserRepository;
 import com.example.Roomy.SocialLogin.Util.JwtTokenProvider;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -40,9 +38,9 @@ public class KakaoService {
     }
 
     //사용자 추가 정보를 저장 후 JWT 발급
-    public String SaveUserInfo(String email, UserResponse userResponse){
+    public String saveUserInfo(String email, UserResponse userResponse){
         //사용자 정보를 저장 or 업데이트
-        Optional<User> existingUser = userRepository.findBySocialIdAndSocialType(email,"Kakao");
+        Optional<User> existingUser = userRepository.findByEmailAndSocialType(email,"Kakao");
 
         if(existingUser.isEmpty()){
             User newUser = new User();
@@ -70,7 +68,7 @@ public class KakaoService {
         params.add("grant_type", "authorization_code");
         params.add("client_id", "0676830eb7f43efe2a27f8fb0d661db9"); // 카카오 REST API 키
         params.add("redirect_uri", "http://127.0.0.1:8080/callback"); // 리다이렉트 URI
-        params.add("code", authorizationCode);
+            params.add("code", authorizationCode);
 
         //요청생성
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
@@ -88,6 +86,22 @@ public class KakaoService {
 
     //카카오 api에서 이메일 요청
     private String getEmail(String accessToken){
+        String userinfoUrl="";
 
+        //HTTP 요청 헤더 설정
+        HttpHeaders headers=new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+
+        //HTTP 요청 생성
+        HttpEntity<Void> request=new HttpEntity<>(headers);
+
+        //카카오 API호출
+        ResponseEntity<KakaoUserResponse> response=
+                restTemplate.exchange(userinfoUrl, HttpMethod.GET, request, KakaoUserResponse.class);
+
+        if(response.getBody()==null||response.getBody().getKakaoAccount().getEmail()==null){
+            throw new RuntimeException("카카오 사용자 이메일 요청 실패");
+        }
+        return  response.getBody().getKakaoAccount().getEmail();
     }
 }
