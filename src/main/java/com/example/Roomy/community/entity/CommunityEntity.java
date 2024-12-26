@@ -1,5 +1,6 @@
 package com.example.Roomy.community.entity;
 
+import com.example.Roomy.SocialLogin.Entity.User;
 import com.example.Roomy.image.entity.FileGroupEntity;
 import com.example.Roomy.like.entity.LikeEntity;
 import jakarta.persistence.*;
@@ -26,6 +27,11 @@ public class CommunityEntity {
     @Comment("게시판 번호")
     private Long communityId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @Comment("작성자")
+    private User author;
+
     @CreationTimestamp
     @Comment("작성 시간")
     private LocalDateTime createdAt;
@@ -51,8 +57,10 @@ public class CommunityEntity {
     private FileGroupEntity fileGroupEntity;
 
     @Column(nullable = false)
+    @Builder.Default
     private int views = 0;
 
     @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
     private List<LikeEntity> likes = new ArrayList<>();
 }

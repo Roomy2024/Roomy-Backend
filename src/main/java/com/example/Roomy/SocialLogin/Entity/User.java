@@ -12,7 +12,7 @@ public class User {
     //DB 연결 후 수정
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(nullable = false)
     private String socialType;

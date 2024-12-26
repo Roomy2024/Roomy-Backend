@@ -1,5 +1,6 @@
 package com.example.Roomy.community.service;
 
+import com.example.Roomy.SocialLogin.Entity.User;
 import com.example.Roomy.community.dto.CommunityRequestDTO;
 import com.example.Roomy.community.dto.CommunityResponseDTO;
 import com.example.Roomy.community.entity.CommunityEntity;
@@ -8,6 +9,7 @@ import com.example.Roomy.image.entity.FileGroupEntity;
 import com.example.Roomy.image.entity.ImageEntity;
 import com.example.Roomy.image.repository.ImageRepository;
 import com.example.Roomy.image.service.FileService;
+import com.example.Roomy.SocialLogin.Repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,21 +28,26 @@ public class CommunityServiceImpl implements CommunityService {
 
     private final CommunityRepository communityRepository;
     private final FileService fileService;
-    private  final ImageRepository imageRepository;
+    private final ImageRepository imageRepository;
+    private final UserRepository userRepository;
 
     @Override
     @Transactional
     public CommunityResponseDTO createCommunity(CommunityRequestDTO communityRequestDTO) throws IOException {
+        User author = userRepository.findById(communityRequestDTO.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
         CommunityEntity communityEntity = CommunityEntity.builder()
                 .title(communityRequestDTO.getTitle())
                 .content(communityRequestDTO.getContent())
                 .type(communityRequestDTO.getType())
+                .author(author) // 작성자 설정
                 .build();
 
         FileGroupEntity fileGroup = new FileGroupEntity();
         if (communityRequestDTO.getImages() != null && !communityRequestDTO.getImages().isEmpty()) {
             for (MultipartFile file : communityRequestDTO.getImages()) {
-                String filePath = fileService.saveFile(file);
+                String filePath = fileService.saveFile(file); // 로컬 디스크에 저장
                 ImageEntity imageEntity = ImageEntity.builder()
                         .imageUrl(filePath)
                         .fileGroup(fileGroup)
@@ -50,10 +57,9 @@ public class CommunityServiceImpl implements CommunityService {
         }
         communityEntity.setFileGroupEntity(fileGroup);
         communityRepository.save(communityEntity);
-        System.out.println("게시글 생성 완료. 게시글 아이디 : " + communityEntity.getCommunityId());
-
         return toResponseDTO(communityEntity);
     }
+
 
     @Override
     @Transactional
@@ -61,11 +67,17 @@ public class CommunityServiceImpl implements CommunityService {
         CommunityEntity communityEntity = communityRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Community not found"));
 
-        // 커뮤니티 데이터 업데이트
+        // 작성자 검증
+        if (communityEntity.getAuthor() == null || !communityEntity.getAuthor().getId().equals(communityRequestDTO.getUserId())) {
+            throw new IllegalStateException("Only the author can update this community");
+        }
+
+        // 게시글 업데이트
         communityEntity.setTitle(communityRequestDTO.getTitle());
         communityEntity.setContent(communityRequestDTO.getContent());
         communityEntity.setType(communityRequestDTO.getType());
 
+        // 파일 그룹 처리
         FileGroupEntity fileGroup = communityEntity.getFileGroupEntity();
         if (fileGroup == null) {
             fileGroup = new FileGroupEntity();
@@ -77,8 +89,6 @@ public class CommunityServiceImpl implements CommunityService {
             List<ImageEntity> existingImages = new ArrayList<>(fileGroup.getImages());
             for (ImageEntity image : existingImages) {
                 String localPath = "/Roomy-Backend/uploads/" + image.getImageUrl().substring("/Roomy-Backend/uploads/".length());
-
-                // 로컬 디스크 파일 삭제
                 try {
                     boolean isFileDeleted = Files.deleteIfExists(Paths.get(localPath));
                     if (isFileDeleted) {
@@ -89,10 +99,7 @@ public class CommunityServiceImpl implements CommunityService {
                 } catch (IOException e) {
                     System.err.println("파일 삭제 중 오류 발생: " + e.getMessage());
                 }
-
-                // 데이터베이스에서 이미지 삭제
                 imageRepository.delete(image);
-                System.out.println("이미지 삭제 성공 (DB): imageId=" + image.getImageId());
             }
             fileGroup.getImages().clear();
         }
@@ -101,12 +108,12 @@ public class CommunityServiceImpl implements CommunityService {
         if (communityRequestDTO.getImages() != null && !communityRequestDTO.getImages().isEmpty()) {
             for (MultipartFile file : communityRequestDTO.getImages()) {
                 try {
-                    String filePath = fileService.saveFile(file); // 파일 저장
+                    String filePath = fileService.saveFile(file);
                     ImageEntity imageEntity = ImageEntity.builder()
                             .imageUrl(filePath)
                             .fileGroup(fileGroup)
                             .build();
-                    fileGroup.getImages().add(imageEntity); // 이미지 엔티티 추가
+                    fileGroup.getImages().add(imageEntity);
                     System.out.println("새로운 이미지 저장 성공: " + filePath);
                 } catch (IOException e) {
                     System.err.println("새로운 이미지 저장 실패: " + file.getOriginalFilename() + ", 오류: " + e.getMessage());
@@ -121,6 +128,7 @@ public class CommunityServiceImpl implements CommunityService {
         System.out.println("커뮤니티 수정 성공: communityId=" + savedEntity.getCommunityId());
         return toResponseDTO(savedEntity);
     }
+
 
 
     @Override
@@ -139,25 +147,30 @@ public class CommunityServiceImpl implements CommunityService {
 
     @Override
     @Transactional
-    public String deleteCommunity(Long id) {
-        // 게시글이 존재하는지 확인
+    public String deleteCommunity(Long id, Long userId) {
+        // 게시글 존재 여부 확인
         CommunityEntity communityEntity = communityRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Community not found with id: " + id));
 
+        // 작성자 검증
+        if (communityEntity.getAuthor() == null || !communityEntity.getAuthor().getId().equals(userId)) {
+            throw new IllegalStateException("Only the author can delete this community");
+        }
+
         // 파일 삭제 로직
         FileGroupEntity fileGroup = communityEntity.getFileGroupEntity();
-        if (fileGroup != null && fileGroup.getImages() != null) {
+        if (fileGroup != null && fileGroup.getImages() != null && !fileGroup.getImages().isEmpty()) {
             for (ImageEntity image : fileGroup.getImages()) {
+                String localPath = "/Roomy-Backend/uploads/" + image.getImageUrl().substring("/Roomy-Backend/uploads/".length());
                 try {
-                    String localPath = "/Roomy-Backend/uploads/" + image.getImageUrl().substring("/Roomy-Backend/uploads/".length());
                     boolean isFileDeleted = Files.deleteIfExists(Paths.get(localPath));
                     if (isFileDeleted) {
                         System.out.println("파일 삭제 성공: " + localPath);
                     } else {
-                        System.out.println("파일 삭제 실패 또는 파일이 존재하지 않음: " + localPath);
+                        System.out.println("파일 삭제 실패 또는 존재하지 않음: " + localPath);
                     }
                 } catch (IOException e) {
-                    System.err.println("파일 삭제 중 오류 발생: " + e.getMessage());
+                    System.err.println("파일 삭제 중 오류 발생: " + localPath + " - 오류 메시지: " + e.getMessage());
                 }
             }
         }
@@ -169,6 +182,8 @@ public class CommunityServiceImpl implements CommunityService {
         // 삭제 결과 메시지 반환
         return "게시글이 성공적으로 삭제되었습니다. 게시글 ID: " + id;
     }
+
+
 
     @Override
     @Transactional
@@ -186,7 +201,9 @@ public class CommunityServiceImpl implements CommunityService {
                 .communityId(communityEntity.getCommunityId())
                 .title(communityEntity.getTitle())
                 .content(communityEntity.getContent())
+                .author(communityEntity.getAuthor().getUsername())
                 .type(communityEntity.getType())
+                .likeCount(communityEntity.getLikes() != null ? communityEntity.getLikes().size() : 0)
                 .createdAt(communityEntity.getCreatedAt())
                 .updatedAt(communityEntity.getUpdatedAt())
                 .views(communityEntity.getViews())

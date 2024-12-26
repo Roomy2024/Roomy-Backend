@@ -11,6 +11,7 @@ public interface CommunityService {
     CommunityResponseDTO updateCommunity(Long id, CommunityRequestDTO communityRequestDTO) throws IOException;
     CommunityResponseDTO getCommunity(Long id);
     List<CommunityResponseDTO> getAllCommunities();
-    String deleteCommunity(Long id);
+    String deleteCommunity(Long id,Long userId);
     public void increaseViewCount(Long id);
+
 }
