@@ -1,6 +1,7 @@
 package com.example.Roomy.community.entity;
 
 import com.example.Roomy.image.entity.FileGroupEntity;
+import com.example.Roomy.like.entity.LikeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
@@ -8,6 +9,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -49,4 +52,7 @@ public class CommunityEntity {
 
     @Column(nullable = false)
     private int views = 0;
+
+    @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<LikeEntity> likes = new ArrayList<>();
 }
