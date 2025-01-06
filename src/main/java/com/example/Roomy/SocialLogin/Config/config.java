@@ -7,7 +7,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class config {
@@ -18,14 +17,23 @@ public class config {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable()) // CSRF 비활성화
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**","/community/**","/likes/**").permitAll() // 인증 API는 모두 허용
+                        .requestMatchers(
+                                "/auth/**",               // 인증 API
+                                "/community/**",          // 커뮤니티 관련 API
+                                "/likes/**",              // 좋아요 API
+                                "/comments/**",           // 댓글 API
+                                "/swagger-ui/**",     // Swagger UI 리소스
+                                "/v3/api-docs/**",    // OpenAPI JSON
+                                "/swagger-ui.html",   // Swagger HTML
+                                "/v3/api-docs.yaml"   // OpenAPI YAML
+                        ).permitAll() // 위 경로는 인증 없이 접근 허용
                         .anyRequest().authenticated() // 그 외 요청은 인증 필요
                 )
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // JWT 기반 인증: 세션 미사용
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // JWT 필터 등록
         return http.build();
     }

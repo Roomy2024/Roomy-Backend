@@ -43,6 +43,7 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5' // JSON 처리 (Jackson 사용)
 	implementation 'javax.servlet:javax.servlet-api:4.0.1'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.2.0'
 }
 
 tasks.named('test') {
