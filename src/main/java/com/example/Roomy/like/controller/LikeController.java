@@ -12,27 +12,29 @@ public class LikeController {
 
     private final LikeService likeService;
 
-    @PostMapping("/{communityId}/like")
-    public ResponseEntity<Void> like(@PathVariable Long communityId, @RequestParam Long userId) {
-        likeService.like(communityId, userId);
-        return ResponseEntity.ok().build();
+    @PostMapping("/{type}/{id}/like-toggle")
+    public ResponseEntity<String> toggleLike(
+            @PathVariable String type,
+            @PathVariable Long id,
+            @RequestParam Long userId) {
+        likeService.toggleLike(id, userId, type);
+        return ResponseEntity.ok("Like toggled successfully.");
     }
 
-    @PostMapping("/{communityId}/unlike")
-    public ResponseEntity<Void> unlike(@PathVariable Long communityId, @RequestParam Long userId) {
-        likeService.unlike(communityId, userId);
-        return ResponseEntity.ok().build();
+    @GetMapping("/{type}/{id}/count")
+    public ResponseEntity<Long> countLikes(
+            @PathVariable String type,
+            @PathVariable Long id) {
+        long count = likeService.countLikes(id, type);
+        return ResponseEntity.ok(count);
     }
 
-    @GetMapping("/{communityId}/count")
-    public ResponseEntity<Long> countLikes(@PathVariable Long communityId) {
-        long likeCount = likeService.countLikes(communityId);
-        return ResponseEntity.ok(likeCount);
-    }
-
-    @GetMapping("/{communityId}/is-liked")
-    public ResponseEntity<Boolean> isLikedByUser(@PathVariable Long communityId, @RequestParam Long userId){
-        boolean isLiked = likeService.isLikedByUser(communityId, userId);
+    @GetMapping("/{type}/{id}/is-liked")
+    public ResponseEntity<Boolean> isLikedByUser(
+            @PathVariable String type,
+            @PathVariable Long id,
+            @RequestParam Long userId) {
+        boolean isLiked = likeService.isLikedByUser(id, userId, type);
         return ResponseEntity.ok(isLiked);
     }
 }

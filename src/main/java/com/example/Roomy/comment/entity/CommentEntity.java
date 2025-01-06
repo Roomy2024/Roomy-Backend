@@ -2,6 +2,7 @@ package com.example.Roomy.comment.entity;
 
 import com.example.Roomy.SocialLogin.Entity.User;
 import com.example.Roomy.community.entity.CommunityEntity;
+import com.example.Roomy.like.entity.LikeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
@@ -51,4 +52,9 @@ public class CommentEntity {
     @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
     private List<ReplyEntity> replies = new ArrayList<>();
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL , orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<LikeEntity> likes = new ArrayList<>();
+
 }

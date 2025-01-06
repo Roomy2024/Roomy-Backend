@@ -1,6 +1,7 @@
 package com.example.Roomy.comment.entity;
 
 import com.example.Roomy.SocialLogin.Entity.User;
+import com.example.Roomy.like.entity.LikeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
@@ -8,6 +9,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -44,4 +47,8 @@ public class ReplyEntity {
     @Column(columnDefinition = "TEXT", nullable = false)
     @Comment("대댓글 내용")
     private String content;
+
+    @OneToMany(mappedBy = "reply", cascade = CascadeType.ALL, orphanRemoval = true , fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<LikeEntity> likes = new ArrayList<>();
 }
