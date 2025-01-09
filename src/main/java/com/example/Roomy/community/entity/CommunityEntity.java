@@ -63,4 +63,5 @@ public class CommunityEntity {
     @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
     private List<LikeEntity> likes = new ArrayList<>();
+
 }
