@@ -20,6 +20,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.jwtTokenProvider=jwtTokenProvider;
     }
 
+    //+JWT 인증 상태 유지 *로그인 유지로직
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException{
