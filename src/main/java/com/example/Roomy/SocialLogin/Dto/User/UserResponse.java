@@ -1,4 +1,4 @@
-package com.example.Roomy.SocialLogin.Entity.Response;
+package com.example.Roomy.SocialLogin.Dto.User;
 
 import lombok.Data;
 
