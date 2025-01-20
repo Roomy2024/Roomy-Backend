@@ -6,19 +6,17 @@ import lombok.Data;
 @Data
 public class KakaoUserResponse {
 
-    private Long id; //사용자 고유 id
+    private Long id;
 
     @JsonProperty("kakao_account")
     private KakaoAccount kakaoAccount;
 
     @Data
-    public static class KakaoAccount{
+    public static class KakaoAccount {
+        @JsonProperty("email") // JSON의 "email" 필드와 매핑
         private String email;
-    }
 
-    @Data
-    public static class kakaoAccessTokenResponse{
-        @JsonProperty("access_token")
-        private String accessToken;
+        @JsonProperty("has_email")
+        private boolean hasEmail;
     }
 }

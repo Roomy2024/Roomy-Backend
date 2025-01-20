@@ -1,5 +1,6 @@
 package com.example.Roomy.SocialLogin.Util;
 
+import com.example.Roomy.SocialLogin.Config.KakaoConfig;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -20,22 +21,26 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    private final String SECRET_KEY = "your-very-strong-secret-key-with-at-least-256-bits!";
-    private final long EXPIRATION_TIME = 1;
+    private final KakaoConfig kakaoConfig;
+    private final long EXPIRATION_TIME = 1000L * 60 * 60 * 24 * 3;
+
+    public JwtTokenProvider(KakaoConfig kakaoConfig) {
+        this.kakaoConfig = kakaoConfig;
+    }
 
 
-    //토큰 생성
-    public String createToken(String userId) {
+    //토큰 생성 *로그인 유지로직
+    public String createToken(Long id) {
         try {
             // JWT의 Payload 설정
             JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                    .subject(userId) // 사용자 ID
+                    .claim("userId", id)
                     .issueTime(new Date()) // 토큰 생성 시간
                     .expirationTime(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // 만료 시간
                     .build();
 
             // HMAC-SHA256 서명 알고리즘으로 서명 생성
-            JWSSigner signer = new MACSigner(SECRET_KEY.getBytes());
+            JWSSigner signer = new MACSigner(kakaoConfig.getSecretKey().getBytes());
 
             // JWT 생성 및 서명
             SignedJWT signedJWT = new SignedJWT(
@@ -44,7 +49,9 @@ public class JwtTokenProvider {
             );
             signedJWT.sign(signer);
 
+            System.out.println(claimsSet.getClaim("userId"));
             // 직렬화된 JWT 반환
+            System.out.println(signedJWT.serialize());
             return signedJWT.serialize();
         } catch (JOSEException e) {
             throw new RuntimeException("JWT 생성 실패: " + e.getMessage());
@@ -55,7 +62,7 @@ public class JwtTokenProvider {
     public boolean validateToken(String token) {
         try{
             SignedJWT signedJWT= SignedJWT.parse(token);
-            JWSVerifier verifier=new MACVerifier(SECRET_KEY.getBytes());
+            JWSVerifier verifier=new MACVerifier(kakaoConfig.getSecretKey().getBytes());
 
             return signedJWT.verify(verifier);
         }

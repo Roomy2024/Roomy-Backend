@@ -1,5 +1,6 @@
 package com.example.Roomy.SocialLogin.Util;
 
+import com.example.Roomy.SocialLogin.Service.Kakao.KakaoService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,11 +16,14 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final KakaoService kakaoService;
 
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider){
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, KakaoService kakaoService){
         this.jwtTokenProvider=jwtTokenProvider;
+        this.kakaoService = kakaoService;
     }
 
+    //+JWT 인증 상태 유지 *로그인 유지로직
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException{
@@ -35,13 +39,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
+        else if (token != null) {
+            // 카카오 액세스 토큰 처리
+            kakaoService.handleKakaoToken(token, request);
+        }
+
         filterChain.doFilter(request,response);
     }
 
     private String getTokenFromRequest(HttpServletRequest request){
         String bearerToken= request.getHeader("Authorization");
 
-        if(bearerToken != null && bearerToken.startsWith("Bearer")){
+        if(bearerToken != null && bearerToken.startsWith("Bearer ")){
             return bearerToken.substring(7); //bearer 제거
         }
         return null;
