@@ -15,4 +15,5 @@ public class CommunityRequestDTO {
     private String content;
     private String type;
     private List<MultipartFile> images;
+    private Long userId;
 }
