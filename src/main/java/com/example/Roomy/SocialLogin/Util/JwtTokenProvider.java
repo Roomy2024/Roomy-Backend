@@ -30,13 +30,11 @@ public class JwtTokenProvider {
 
 
     //토큰 생성 *로그인 유지로직
-    public String createToken(String email, String username, Long id) {
+    public String createToken(Long id) {
         try {
             // JWT의 Payload 설정
             JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-                    .subject(email) // 유저 이메일
-                    .claim("username", username) //유저 닉네임
-                    .claim("id", id)
+                    .claim("userId", id)
                     .issueTime(new Date()) // 토큰 생성 시간
                     .expirationTime(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // 만료 시간
                     .build();
@@ -51,7 +49,9 @@ public class JwtTokenProvider {
             );
             signedJWT.sign(signer);
 
+            System.out.println(claimsSet.getClaim("userId"));
             // 직렬화된 JWT 반환
+            System.out.println(signedJWT.serialize());
             return signedJWT.serialize();
         } catch (JOSEException e) {
             throw new RuntimeException("JWT 생성 실패: " + e.getMessage());

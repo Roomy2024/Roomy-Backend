@@ -17,8 +17,8 @@ public class User {
     @Column(nullable = false)
     private String socialType;
 
-    @Column(nullable = false)
-    private String username;
+    @Column(nullable = true)
+    private String username ;
 
     @Column
     private String email;

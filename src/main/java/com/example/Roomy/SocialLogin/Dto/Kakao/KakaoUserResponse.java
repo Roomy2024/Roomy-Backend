@@ -18,8 +18,5 @@ public class KakaoUserResponse {
 
         @JsonProperty("has_email")
         private boolean hasEmail;
-
-        @JsonProperty("email_needs_agreement")
-        private boolean emailNeedsAgreement;
     }
 }
