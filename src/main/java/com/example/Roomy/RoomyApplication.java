@@ -5,11 +5,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 //@EntityScan(basePackages = {"com.my.jpa.entity"})
 //@EnableJpaRepositories(basePackages = {"com.my.jpa.repository"})
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.example.Roomy")
 public class RoomyApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(RoomyApplication.class, args);
 	}
-
 }
+
