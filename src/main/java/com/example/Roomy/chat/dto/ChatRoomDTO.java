@@ -4,7 +4,7 @@ import java.util.List;
 
 public class ChatRoomDTO {
     private String roomId; // 채팅방 ID
-    private List<String> users; // 채팅방 사용자 목록
+    private List<String> users; // 사용자 ID 목록
 
     // 기본 생성자 (Firebase 직렬화용)
     public ChatRoomDTO() {
