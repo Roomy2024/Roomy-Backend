@@ -1,7 +1,6 @@
-package com.example.Roomy.community.entity;
+package com.example.Roomy.comment.entity;
 
 import com.example.Roomy.SocialLogin.Entity.User;
-import com.example.Roomy.image.entity.FileGroupEntity;
 import com.example.Roomy.like.entity.LikeEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,13 +18,18 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "community")
-public class CommunityEntity {
+@Table(name = "replies")
+public class ReplyEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Comment("게시판 번호")
-    private Long communityId;
+    @Comment("대댓글 번호")
+    private Long replyId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "comment_id", nullable = false)
+    @Comment("부모 댓글 번호")
+    private CommentEntity parentComment;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -40,28 +44,11 @@ public class CommunityEntity {
     @Comment("수정 시간")
     private LocalDateTime updatedAt;
 
-    @Column(nullable = false)
-    @Comment("제목")
-    private String title;
-
     @Column(columnDefinition = "TEXT", nullable = false)
-    @Comment("내용")
+    @Comment("대댓글 내용")
     private String content;
 
-    @Column(nullable = false)
-    @Comment("커뮤니티 타입")
-    private String type;
-
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "file_group_id")
-    private FileGroupEntity fileGroupEntity;
-
-    @Column(nullable = false)
-    @Builder.Default
-    private int views = 0;
-
-    @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "reply", cascade = CascadeType.ALL, orphanRemoval = true , fetch = FetchType.LAZY)
     @Builder.Default
     private List<LikeEntity> likes = new ArrayList<>();
-
 }
