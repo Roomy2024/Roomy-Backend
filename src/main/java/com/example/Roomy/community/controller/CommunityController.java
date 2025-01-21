@@ -19,6 +19,7 @@ public class CommunityController {
 
     @PostMapping("/create")
     public ResponseEntity<CommunityResponseDTO> createCommunity(@ModelAttribute CommunityRequestDTO communityRequestDTO) throws IOException {
+        System.out.println(communityRequestDTO);
         return ResponseEntity.ok(communityService.createCommunity(communityRequestDTO));
     }
 

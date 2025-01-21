@@ -30,7 +30,7 @@ public class config {
         http.csrf(csrf -> csrf.disable()) // CSRF 비활성화
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll() // 인증 API는 모두 허용
+                        .requestMatchers("/auth/**","/community/**").permitAll() // 인증 API는 모두 허용
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().permitAll() // 그 외 요청은 인증 필요
                 )

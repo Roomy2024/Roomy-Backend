@@ -1,4 +1,4 @@
-package com.example.Roomy.chat.service;
+package com.example.Roomy.chat.util;
 
 import java.time.Instant;
 import java.time.ZoneId;

@@ -3,11 +3,15 @@ package com.example.Roomy.community.entity;
 import com.example.Roomy.SocialLogin.Entity.User;
 import com.example.Roomy.image.entity.FileGroupEntity;
 import com.example.Roomy.like.entity.LikeEntity;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,20 +24,24 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "community")
+@Tag(name = "Community API")
 public class CommunityEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Comment("게시판 번호")
+    @Schema(description = "커뮤니티 ID", example = "1")
     private Long communityId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     @Comment("작성자")
+    @Schema(description = "작성자 정보")
     private User author;
 
     @CreationTimestamp
     @Comment("작성 시간")
+    @Schema(description = "작성 시간")
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
