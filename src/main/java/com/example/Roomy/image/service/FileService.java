@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 @Service
 public class FileService {
 
-    private final String uploadDir = "/Roomy-Backend/uploads/";
+    private final String uploadDir = "src/main/resources/static/imgs";
 
     public FileService() {
         File directory = new File(uploadDir);
@@ -25,6 +25,6 @@ public class FileService {
         String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
         Path filePath = Paths.get(uploadDir, fileName);
         Files.copy(file.getInputStream(), filePath);
-        return "/Roomy-Backend/uploads/" + fileName;
+        return "src/main/resources/static/imgs" + fileName;
     }
 }
