@@ -1,42 +1,39 @@
 package com.example.Roomy.SocialLogin.Config;
 
-import com.example.Roomy.SocialLogin.Util.JwtAuthenticationFilter;
+import com.example.Roomy.SocialLogin.Service.CustomOAuth2UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
-@EnableWebSecurity
+
 @Configuration
-public class config {
+@EnableWebSecurity
+@RequiredArgsConstructor
+public class Config {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-
-    public config(JwtAuthenticationFilter jwtAuthenticationFilter) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-    }
-
+    private final CustomOAuth2UserService customOAuth2UserService;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable()) // CSRF 비활성화
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**","/community/**").permitAll() // 인증 API는 모두 허용
+                        .requestMatchers("/api/**").permitAll() // 인증 API는 모두 허용
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().permitAll() // 그 외 요청은 인증 필요
                 )
                 //.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // JWT 필터 추가
-                .oauth2Login(oauth -> oauth
-                        .defaultSuccessUrl("/auth/kakao/save-user", true) // 로그인 성공 시 리다이렉트 URL 설정
+                .oauth2Login(oauth2Login -> oauth2Login
+                        .userInfoEndpoint(userInfoEndpoint ->
+                                userInfoEndpoint.userService(customOAuth2UserService) // 사용자 정보 처리
+                        )
                 );
         return http.build();
     }
@@ -54,7 +51,6 @@ public class config {
         corsConfiguration.setAllowedMethods(List.of("GET","POST","DELETE","OPTIONS"));
         //허용할 요청 헤더 설정
         corsConfiguration.setAllowedHeaders(List.of("*"));
-
         //CORS 설정을 URL 패턴에 등록
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**",corsConfiguration);

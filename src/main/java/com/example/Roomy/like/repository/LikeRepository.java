@@ -1,6 +1,6 @@
 package com.example.Roomy.like.repository;
 
-import com.example.Roomy.SocialLogin.Entity.User;
+import com.example.Roomy.SocialLogin.Model.User;
 import com.example.Roomy.comment.entity.CommentEntity;
 import com.example.Roomy.comment.entity.ReplyEntity;
 import com.example.Roomy.community.entity.CommunityEntity;
