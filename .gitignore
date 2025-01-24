@@ -39,4 +39,6 @@ out/
 # Firebase 설정 파일 제외
 src/main/resources/RoomyFirebase.json
 src/main/resources/static/imgs/
+/application.properties
+
 src/main/resources/application.properties

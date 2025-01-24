@@ -1,62 +1,65 @@
 package com.example.Roomy.image.service;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class FileService {
 
-    private final String baseUploadDir = "src/main/resources/static/imgs";
+    private final AmazonS3 amazonS3;
 
-    public FileService() {
-        File directory = new File(baseUploadDir);
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
-    }
+    @Value("${aws.s3.bucket-name}")
+    private String bucketName;
 
-    // 이미지 저장 및 형식 통일, 해상도 조정
-    public String saveAndResizeImage(MultipartFile file, int targetWidth, int targetHeight) throws IOException {
-        // 원본 이미지 읽기
+    @Value("${aws.s3.bucket-url}")
+    private String bucketUrl;
+
+    public String uploadImageToS3(MultipartFile file, int targetWidth, int targetHeight) throws IOException {
         BufferedImage originalImage = ImageIO.read(file.getInputStream());
-        if (originalImage == null) {
-            throw new IOException("이미지 파일이 아닙니다.");
-        }
-
-        // 해상도 조정
         BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = resizedImage.createGraphics();
         graphics.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
         graphics.dispose();
 
-        // 저장 경로 생성
-        LocalDate today = LocalDate.now();
-        String datePath = today.getYear() + "/" + today.getMonthValue() + "/" + today.getDayOfMonth();
-        Path directoryPath = Paths.get(baseUploadDir, datePath);
-        if (!Files.exists(directoryPath)) {
-            Files.createDirectories(directoryPath);
-        }
+        String fileName = generateUniqueFileName(file.getOriginalFilename());
 
-        // 파일 이름 설정 (공백 제거 + 랜덤 UUID)
-        String originalFileName = file.getOriginalFilename().replaceAll("\\s+", "");
-        String fileName = UUID.randomUUID() + "_" + originalFileName.replaceAll("\\..+$", ".jpg"); // 확장자 통일
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ImageIO.write(resizedImage, "jpg", outputStream);
+        byte[] imageBytes = outputStream.toByteArray();
 
-        // 파일 저장
-        Path filePath = directoryPath.resolve(fileName);
-        ImageIO.write(resizedImage, "jpg", filePath.toFile());
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(imageBytes.length);
+        metadata.setContentType("image/jpeg");
 
-        return "/imgs/" + datePath + "/" + fileName;
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(imageBytes);
+        // ACL 제거
+        amazonS3.putObject(new PutObjectRequest(bucketName, fileName, inputStream, metadata));
+
+        return bucketUrl + "/" + fileName;
+    }
+
+    public void deleteFileFromS3(String fileUrl) {
+        String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+        amazonS3.deleteObject(bucketName, fileName);
+    }
+
+    private String generateUniqueFileName(String originalFileName) {
+        String extension = originalFileName.substring(originalFileName.lastIndexOf('.') + 1);
+        return UUID.randomUUID().toString() + "." + extension;
     }
 }
-

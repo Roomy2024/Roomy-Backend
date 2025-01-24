@@ -41,16 +41,15 @@ public class CommunityServiceImpl implements CommunityService {
                 .title(communityRequestDTO.getTitle())
                 .content(communityRequestDTO.getContent())
                 .type(communityRequestDTO.getType())
-                .author(author) // 작성자 설정
+                .author(author)
                 .build();
 
         FileGroupEntity fileGroup = new FileGroupEntity();
         if (communityRequestDTO.getImages() != null && !communityRequestDTO.getImages().isEmpty()) {
             for (MultipartFile file : communityRequestDTO.getImages()) {
-                // 이미지 저장 및 처리
-                String filePath = fileService.saveAndResizeImage(file, 800, 600); // 해상도 조정
+                String fileUrl = fileService.uploadImageToS3(file, 800, 600);
                 ImageEntity imageEntity = ImageEntity.builder()
-                        .imageUrl(filePath)
+                        .imageUrl(fileUrl)
                         .fileGroup(fileGroup)
                         .build();
                 fileGroup.getImages().add(imageEntity);
@@ -61,73 +60,47 @@ public class CommunityServiceImpl implements CommunityService {
         return toResponseDTO(communityEntity);
     }
 
-
-
     @Override
     @Transactional
     public CommunityResponseDTO updateCommunity(Long id, CommunityRequestDTO communityRequestDTO) throws IOException {
         CommunityEntity communityEntity = communityRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Community not found"));
 
-        // 작성자 검증
         if (communityEntity.getAuthor() == null || !communityEntity.getAuthor().getId().equals(communityRequestDTO.getUserId())) {
             throw new IllegalStateException("Only the author can update this community");
         }
 
-        // 게시글 업데이트
         communityEntity.setTitle(communityRequestDTO.getTitle());
         communityEntity.setContent(communityRequestDTO.getContent());
         communityEntity.setType(communityRequestDTO.getType());
 
-        // 파일 그룹 처리
         FileGroupEntity fileGroup = communityEntity.getFileGroupEntity();
         if (fileGroup == null) {
             fileGroup = new FileGroupEntity();
             communityEntity.setFileGroupEntity(fileGroup);
         }
 
-        // 기존 이미지 삭제 로직
         if (fileGroup.getImages() != null && !fileGroup.getImages().isEmpty()) {
             List<ImageEntity> existingImages = new ArrayList<>(fileGroup.getImages());
             for (ImageEntity image : existingImages) {
-                String localPath = "/Roomy-Backend/uploads/" + image.getImageUrl().substring("/Roomy-Backend/uploads/".length());
-                try {
-                    boolean isFileDeleted = Files.deleteIfExists(Paths.get(localPath));
-                    if (isFileDeleted) {
-                        System.out.println("파일 삭제 성공: " + localPath);
-                    } else {
-                        System.out.println("파일 삭제 실패 또는 존재하지 않음: " + localPath);
-                    }
-                } catch (IOException e) {
-                    System.err.println("파일 삭제 중 오류 발생: " + e.getMessage());
-                }
+                fileService.deleteFileFromS3(image.getImageUrl());
                 imageRepository.delete(image);
             }
             fileGroup.getImages().clear();
         }
 
-        // 새로운 이미지 추가
         if (communityRequestDTO.getImages() != null && !communityRequestDTO.getImages().isEmpty()) {
             for (MultipartFile file : communityRequestDTO.getImages()) {
-                try {
-                    String filePath = fileService.saveAndResizeImage(file, 800, 600); // 해상도 조정 포함 저장
-                    ImageEntity imageEntity = ImageEntity.builder()
-                            .imageUrl(filePath)
-                            .fileGroup(fileGroup)
-                            .build();
-                    fileGroup.getImages().add(imageEntity);
-                    System.out.println("새로운 이미지 저장 성공: " + filePath);
-                } catch (IOException e) {
-                    System.err.println("새로운 이미지 저장 실패: " + file.getOriginalFilename() + ", 오류: " + e.getMessage());
-                }
+                String filePath = fileService.uploadImageToS3(file, 800, 600);
+                ImageEntity imageEntity = ImageEntity.builder()
+                        .imageUrl(filePath)
+                        .fileGroup(fileGroup)
+                        .build();
+                fileGroup.getImages().add(imageEntity);
             }
-        } else {
-            System.out.println("새로운 이미지가 제공되지 않았습니다.");
         }
 
-        // 엔티티 저장 및 응답 반환
         CommunityEntity savedEntity = communityRepository.save(communityEntity);
-        System.out.println("커뮤니티 수정 성공: communityId=" + savedEntity.getCommunityId());
         return toResponseDTO(savedEntity);
     }
 
@@ -212,6 +185,4 @@ public class CommunityServiceImpl implements CommunityService {
                 .imageUrls(imageUrls)
                 .build();
     }
-
-
 }
