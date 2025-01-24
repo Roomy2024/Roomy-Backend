@@ -47,7 +47,8 @@ public class CommunityServiceImpl implements CommunityService {
         FileGroupEntity fileGroup = new FileGroupEntity();
         if (communityRequestDTO.getImages() != null && !communityRequestDTO.getImages().isEmpty()) {
             for (MultipartFile file : communityRequestDTO.getImages()) {
-                String filePath = fileService.saveFile(file); // 로컬 디스크에 저장
+                // 이미지 저장 및 처리
+                String filePath = fileService.saveAndResizeImage(file, 800, 600); // 해상도 조정
                 ImageEntity imageEntity = ImageEntity.builder()
                         .imageUrl(filePath)
                         .fileGroup(fileGroup)
@@ -59,6 +60,7 @@ public class CommunityServiceImpl implements CommunityService {
         communityRepository.save(communityEntity);
         return toResponseDTO(communityEntity);
     }
+
 
 
     @Override
@@ -108,7 +110,7 @@ public class CommunityServiceImpl implements CommunityService {
         if (communityRequestDTO.getImages() != null && !communityRequestDTO.getImages().isEmpty()) {
             for (MultipartFile file : communityRequestDTO.getImages()) {
                 try {
-                    String filePath = fileService.saveFile(file);
+                    String filePath = fileService.saveAndResizeImage(file, 800, 600); // 해상도 조정 포함 저장
                     ImageEntity imageEntity = ImageEntity.builder()
                             .imageUrl(filePath)
                             .fileGroup(fileGroup)
