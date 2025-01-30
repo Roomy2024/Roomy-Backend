@@ -14,7 +14,6 @@ public interface CommunityRepository extends JpaRepository<CommunityEntity, Long
     @Query("UPDATE CommunityEntity c SET c.views = c.views + 1 WHERE c.communityId = :id")
     void increaseViewCount(@Param("id") Long id);
 
-
     @Query("SELECT COUNT(l) FROM LikeEntity l WHERE l.community.communityId = :communityId")
     int countLikes(@Param("communityId") Long communityId);
 }
