@@ -1,15 +1,14 @@
 package com.example.Roomy.SocialLogin.Service;
 
-import com.example.Roomy.SocialLogin.Model.CustomUserDetails;
-import com.example.Roomy.SocialLogin.Model.OAuth2UserInfo;
-import com.example.Roomy.SocialLogin.Model.User;
+import com.example.Roomy.SocialLogin.Entity.CustomUserDetails;
+import com.example.Roomy.SocialLogin.Entity.OAuth2UserInfo;
+import com.example.Roomy.SocialLogin.Entity.User;
+import com.example.Roomy.SocialLogin.JWT.JwtTokenProvider;
 import com.example.Roomy.SocialLogin.UserRepository;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -19,6 +18,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -34,16 +34,37 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfo.of(provider, oAuth2User.getAttributes());
         log.info("oAuth2UserInfo : {}", oAuth2UserInfo.toString());
 
-        // 4. oAuth2UserInfo가 저장되어 있는지 유저 정보 확인
-        //    없으면 DB 저장 후 해당 유저를 저장
-        //    있으면 해당 유저를 저장
-        User user = userRepository.findByEmail(oAuth2UserInfo.getEmail())
-                .orElseGet(() -> userRepository.save(oAuth2UserInfo.toEntity()));
-        log.info("user : {}", user.toString());
+        // 4. DB에서 이메일 조회
+        User user = userRepository.findByEmail(oAuth2UserInfo.getEmail()).orElse(null);
 
-        log.info("UserRepository is null: {}", userRepository == null);
+        if (user != null) {
+            // 이메일이 이미 존재하는 경우 provider를 비교하여 로그인할지, 회원가입할지 결정
+            String userProvider = user.getProvider(); // 저장되어 있는 이메일의 provider를 가져옴
 
-        // 5. UserDetails와 OAuth2User를 다중 상속한 CustomUserDetails
-        return new CustomUserDetails(user, oAuth2User.getAttributes());
+            if (userProvider.equals(provider)) {
+                log.info("로그인에 성공했습니다.");
+
+                return new CustomUserDetails(user, oAuth2User.getAttributes());
+            } else {
+                // provider가 다를 경우 예외
+                log.warn("이미 회원가입 된 이메일입니다: email={}, provider={}", oAuth2UserInfo.getEmail(), userProvider);
+                // 사용자에게 반환할 메세지
+                throw new OAuth2AuthenticationException("이미 회원가입 된 이메일입니다 " + userProvider + "로 로그인을 시도해주세요");
+            }
+        }
+
+        // 5. 새로운 유저 저장
+        User newUser = oAuth2UserInfo.toEntity(); // OAuth2UserInfo에서 새로운 유저 엔티티 생성
+        userRepository.save(newUser); // DB에 저장
+        log.info("user: {}", newUser);
+
+        // 6. UserDetails와 OAuth2User를 다중 상속한 CustomUserDetails 반환
+        return new CustomUserDetails(newUser, oAuth2User.getAttributes());
+
+    }
+
+    public User saveRefreshToken(User user, String refreshToken){
+        user.setRefreshToken(refreshToken);
+        return userRepository.save(user);
     }
 }
