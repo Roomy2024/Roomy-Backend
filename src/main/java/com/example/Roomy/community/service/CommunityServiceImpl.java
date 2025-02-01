@@ -114,6 +114,14 @@ public class CommunityServiceImpl implements CommunityService {
     }
 
     @Override
+    public List<CommunityResponseDTO> getMyCommunities(Long userId) {
+        List<CommunityEntity> userCommunities = communityRepository.findByAuthorId(userId);
+        return userCommunities.stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<CommunityResponseDTO> getAllCommunities() {
         return communityRepository.findAll().stream()
                 .map(this::toResponseDTO)
