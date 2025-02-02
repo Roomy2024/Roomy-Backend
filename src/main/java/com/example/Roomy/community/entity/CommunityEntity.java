@@ -1,6 +1,6 @@
 package com.example.Roomy.community.entity;
 
-import com.example.Roomy.SocialLogin.Model.User;
+import com.example.Roomy.SocialLogin.Entity.User;
 import com.example.Roomy.image.entity.FileGroupEntity;
 import com.example.Roomy.like.entity.LikeEntity;
 import io.swagger.v3.oas.annotations.media.Schema;

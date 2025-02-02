@@ -1,6 +1,6 @@
 package com.example.Roomy.chat.service.privatechat;
 
-import com.example.Roomy.SocialLogin.Model.User;
+import com.example.Roomy.SocialLogin.Entity.User;
 import com.example.Roomy.SocialLogin.UserRepository;
 import com.example.Roomy.chat.dto.ChatMessageDTO;
 import com.example.Roomy.chat.dto.ChatRoomDTO;

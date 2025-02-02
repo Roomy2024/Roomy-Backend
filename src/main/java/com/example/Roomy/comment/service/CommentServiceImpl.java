@@ -1,6 +1,6 @@
 package com.example.Roomy.comment.service;
 
-import com.example.Roomy.SocialLogin.Model.User;
+import com.example.Roomy.SocialLogin.Entity.User;
 import com.example.Roomy.SocialLogin.UserRepository;
 import com.example.Roomy.comment.dto.*;
 import com.example.Roomy.comment.entity.CommentEntity;

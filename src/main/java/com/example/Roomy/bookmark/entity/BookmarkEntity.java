@@ -1,7 +1,7 @@
 package com.example.Roomy.bookmark.entity;
 
 
-import com.example.Roomy.SocialLogin.Model.User;
+import com.example.Roomy.SocialLogin.Entity.User;
 import com.example.Roomy.community.entity.CommunityEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
