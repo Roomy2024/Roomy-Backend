@@ -6,11 +6,14 @@ import com.example.Roomy.Report.Repository.ReportRepository;
 import com.example.Roomy.Report.Service.ReportService;
 import com.example.Roomy.SocialLogin.DTO.UserRequest;
 import com.example.Roomy.SocialLogin.Entity.User;
+import com.example.Roomy.SocialLogin.JWT.JwtTokenProvider;
 import com.example.Roomy.SocialLogin.UserRepository;
 import com.google.firebase.database.core.Repo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,14 +23,17 @@ public class ReportController {
     private final ReportRepository reportRepository;
     private final ReportService reportService;
     private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
+
 
     @PostMapping("/{type}")
-    public ResponseEntity<String> report(@RequestBody ReportRequest reportRequest, @PathVariable String type) {
-        //User ID를 사용하여 실제 User 객체 조회
-        User reporter = userRepository.findById(reportRequest.getRepoterId())
-                .orElseThrow(() -> new RuntimeException("신고자를 찾을 수 없습니다."));
-        User reported = userRepository.findById(reportRequest.getReportedId())
-                .orElseThrow(() -> new RuntimeException("신고 대상 사용자를 찾을 수 없습니다."));
+    public ResponseEntity<String> report(@PathVariable String type, @RequestBody Map<String, Long> requestBody, @RequestHeader("Authorization") String token) {
+        //JWT 토큰에서 신고한 사용자 ID 추출
+        String jwtToken = token.replace("Bearer ", ""); // "Bearer " 제거
+        Long reporter = Long.parseLong(jwtTokenProvider.getUserIdFromToken(jwtToken));
+
+        // ✅ 신고당한 사용자 ID 가져오기 (Body에서 직접 받음)
+        Long reported = requestBody.get("reportedId");
 
         //Report 저장
         reportService.saveReport(type, reporter, reported);

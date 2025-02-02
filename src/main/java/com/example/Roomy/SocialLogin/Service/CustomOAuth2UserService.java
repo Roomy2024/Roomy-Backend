@@ -44,6 +44,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             if (userProvider.equals(provider)) {
                 log.info("로그인에 성공했습니다.");
 
+                //Access Token & Refresh Token 생성
+                String accessToken = jwtTokenProvider.createAccessToken(user.getId());
+                String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
+
                 return new CustomUserDetails(user, oAuth2User.getAttributes());
             } else {
                 // provider가 다를 경우 예외

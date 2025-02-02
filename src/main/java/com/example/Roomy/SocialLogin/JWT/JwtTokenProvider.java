@@ -134,7 +134,7 @@ public class JwtTokenProvider {
     public String getUserIdFromToken(String token) {
         try{
             SignedJWT signedJWT = SignedJWT.parse(token);
-            return signedJWT.getJWTClaimsSet().getSubject();
+            return signedJWT.getJWTClaimsSet().getLongClaim("id").toString();
         }
         catch(Exception e){
             throw new RuntimeException("파싱 실패");

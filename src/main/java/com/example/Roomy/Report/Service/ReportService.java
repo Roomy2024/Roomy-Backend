@@ -19,14 +19,19 @@ public class ReportService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Report saveReport(String type, User repoter,  User reported){
-        if(reportRepository.existsByReporterAndReported(reported, reported))
-        {
+    public Report saveReport(String type, Long reporter,  Long reported){
+        // ✅ ID를 이용해 실제 User 객체 조회
+        User reporterId = userRepository.findById(reporter)
+                .orElseThrow(() -> new RuntimeException("신고자를 찾을 수 없습니다."));
+        User reportedId = userRepository.findById(reported)
+                .orElseThrow(() -> new RuntimeException("신고당한 사용자를 찾을 수 없습니다."));
+
+        //중복 신고 확인
+        if (reportRepository.existsByReporterAndReported(reporterId, reportedId)) {
             throw new RuntimeException("이미 신고한 이력이 있습니다.");
         }
 
         Report report = new Report();
-
         switch (type){
             case "chatting":
                 report.setType("chatting");
@@ -38,20 +43,19 @@ public class ReportService {
                 report.setType("comment");
                 break;
         }
-        report.setReporter(repoter);
-        report.setReported(reported);
+        report.setReporter(reporterId);
+        report.setReported(reportedId);
         report.setLocalDateTime(LocalDateTime.now());
 
+        reportedId.setReportCount(reportedId.getReportCount()+1);
+
         reportRepository.save(report);
-
-        reported.setReportCount(reported.getReportCount()+1);
-
-        userRepository.save(reported);
+        userRepository.save(reportedId);
 
         //신고누적이 10개 이상이 되면 일시정지
-        if(reported.getReportCount() >= 10){
-            reported.setStatus(UserActivity.BAN);
-            userRepository.save(reported);
+        if(reportedId.getReportCount() >= 10){
+            reportedId.setStatus(UserActivity.BAN);
+            userRepository.save(reportedId);
         }
 
         return report;
