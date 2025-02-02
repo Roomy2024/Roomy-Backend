@@ -42,6 +42,11 @@ public class CommunityController {
         return ResponseEntity.ok(communityService.getAllCommunities());
     }
 
+    @GetMapping("/my/{userId}")
+    public ResponseEntity<List<CommunityResponseDTO>> getMyCommunities(@PathVariable Long userId) {
+        return ResponseEntity.ok(communityService.getMyCommunities(userId));
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteCommunity(@PathVariable Long id, @RequestParam Long userId) {
         return ResponseEntity.ok(communityService.deleteCommunity(id, userId));

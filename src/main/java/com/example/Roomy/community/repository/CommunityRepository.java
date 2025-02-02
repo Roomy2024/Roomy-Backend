@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface CommunityRepository extends JpaRepository<CommunityEntity, Long> {
 
@@ -14,7 +16,9 @@ public interface CommunityRepository extends JpaRepository<CommunityEntity, Long
     @Query("UPDATE CommunityEntity c SET c.views = c.views + 1 WHERE c.communityId = :id")
     void increaseViewCount(@Param("id") Long id);
 
-
     @Query("SELECT COUNT(l) FROM LikeEntity l WHERE l.community.communityId = :communityId")
     int countLikes(@Param("communityId") Long communityId);
+
+    @Query("SELECT c FROM CommunityEntity c WHERE c.author.id = :userId")
+    List<CommunityEntity> findByAuthorId(@Param("userId") Long userId);
 }
