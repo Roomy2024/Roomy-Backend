@@ -12,12 +12,12 @@ import com.example.Roomy.image.service.FileService;
 import com.example.Roomy.SocialLogin.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +30,8 @@ public class CommunityServiceImpl implements CommunityService {
     private final FileService fileService;
     private final ImageRepository imageRepository;
     private final UserRepository userRepository;
+
+    private static final Logger logger = LoggerFactory.getLogger(CommunityServiceImpl.class);
 
     @Override
     @Transactional
@@ -83,7 +85,11 @@ public class CommunityServiceImpl implements CommunityService {
         if (fileGroup.getImages() != null && !fileGroup.getImages().isEmpty()) {
             List<ImageEntity> existingImages = new ArrayList<>(fileGroup.getImages());
             for (ImageEntity image : existingImages) {
-                fileService.deleteFileFromS3(image.getImageUrl());
+                try {
+                    fileService.deleteFileFromS3(image.getImageUrl());
+                } catch (Exception e) {
+                    logger.error("파일 삭제 중 오류 발생: {}", image.getImageUrl(), e);
+                }
                 imageRepository.delete(image);
             }
             fileGroup.getImages().clear();
@@ -103,8 +109,6 @@ public class CommunityServiceImpl implements CommunityService {
         CommunityEntity savedEntity = communityRepository.save(communityEntity);
         return toResponseDTO(savedEntity);
     }
-
-
 
     @Override
     public CommunityResponseDTO getCommunity(Long id) {
@@ -140,45 +144,40 @@ public class CommunityServiceImpl implements CommunityService {
             throw new IllegalStateException("Only the author can delete this community");
         }
 
-        // 파일 삭제 로직
+        // 파일 삭제 로직 (S3에 업로드된 파일 삭제)
         FileGroupEntity fileGroup = communityEntity.getFileGroupEntity();
         if (fileGroup != null && fileGroup.getImages() != null && !fileGroup.getImages().isEmpty()) {
             for (ImageEntity image : fileGroup.getImages()) {
-                String localPath = "/Roomy-Backend/uploads/" + image.getImageUrl().substring("/Roomy-Backend/uploads/".length());
                 try {
-                    boolean isFileDeleted = Files.deleteIfExists(Paths.get(localPath));
-                    if (isFileDeleted) {
-                        System.out.println("파일 삭제 성공: " + localPath);
-                    } else {
-                        System.out.println("파일 삭제 실패 또는 존재하지 않음: " + localPath);
-                    }
-                } catch (IOException e) {
-                    System.err.println("파일 삭제 중 오류 발생: " + localPath + " - 오류 메시지: " + e.getMessage());
+                    fileService.deleteFileFromS3(image.getImageUrl());
+                } catch (Exception e) {
+                    logger.error("파일 삭제 중 오류 발생: {}", image.getImageUrl(), e);
                 }
             }
         }
 
         // 게시글 삭제
         communityRepository.delete(communityEntity);
-        System.out.println("게시글 삭제 성공: communityId=" + id);
+        logger.info("게시글 삭제 성공: communityId={}", id);
 
         // 삭제 결과 메시지 반환
         return "게시글이 성공적으로 삭제되었습니다. 게시글 ID: " + id;
     }
 
-
-
     @Override
     @Transactional
-    public void increaseViewCount(Long id){
+    public void increaseViewCount(Long id) {
         communityRepository.increaseViewCount(id);
-        System.out.println("조회수가 증가 한 게시글 아이디 : " + id);
+        logger.info("조회수가 증가 한 게시글 아이디: {}", id);
     }
 
     private CommunityResponseDTO toResponseDTO(CommunityEntity communityEntity) {
-        List<String> imageUrls = communityEntity.getFileGroupEntity().getImages().stream()
-                .map(ImageEntity::getImageUrl)
-                .collect(Collectors.toList());
+        List<String> imageUrls = new ArrayList<>();
+        if (communityEntity.getFileGroupEntity() != null && communityEntity.getFileGroupEntity().getImages() != null) {
+            imageUrls = communityEntity.getFileGroupEntity().getImages().stream()
+                    .map(ImageEntity::getImageUrl)
+                    .collect(Collectors.toList());
+        }
 
         return CommunityResponseDTO.builder()
                 .communityId(communityEntity.getCommunityId())
