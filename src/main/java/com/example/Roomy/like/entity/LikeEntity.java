@@ -4,6 +4,7 @@ import com.example.Roomy.SocialLogin.Entity.User;
 import com.example.Roomy.comment.entity.CommentEntity;
 import com.example.Roomy.comment.entity.ReplyEntity;
 import com.example.Roomy.community.entity.CommunityEntity;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
@@ -23,6 +24,7 @@ public class LikeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "community_id", nullable = true)
+    @Schema(description = "커뮤니티")
     private CommunityEntity community;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -31,10 +33,12 @@ public class LikeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_id", nullable = true)
+    @Schema(description = "댓글")
     private CommentEntity comment;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reply_id", nullable = true)
+    @Schema(description = "대댓글")
     private ReplyEntity reply;
 
     // 엔티티 저장 전 유효성 검사
@@ -49,7 +53,7 @@ public class LikeEntity {
 
         // community, comment, reply 중 정확히 하나만 설정되어야 합니다.
         if (nonNullCount != 1) {
-            throw new IllegalStateException("One and only one of community, comment, or reply must be non-null.");
+            throw new IllegalStateException("3개중 하나만 설정되어야 함");
         }
     }
 }

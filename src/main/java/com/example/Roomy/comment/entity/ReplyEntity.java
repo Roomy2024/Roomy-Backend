@@ -2,6 +2,7 @@ package com.example.Roomy.comment.entity;
 
 import com.example.Roomy.SocialLogin.Entity.User;
 import com.example.Roomy.like.entity.LikeEntity;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
@@ -29,11 +30,13 @@ public class ReplyEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_id", nullable = false)
     @Comment("부모 댓글 번호")
+    @Schema(description = "댓글")
     private CommentEntity parentComment;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     @Comment("작성자")
+    @Schema(description = "작성자")
     private User author;
 
     @CreationTimestamp
@@ -46,6 +49,7 @@ public class ReplyEntity {
 
     @Column(columnDefinition = "TEXT", nullable = false)
     @Comment("대댓글 내용")
+    @Schema(description = "대댓글 내용")
     private String content;
 
     @OneToMany(mappedBy = "reply", cascade = CascadeType.ALL, orphanRemoval = true , fetch = FetchType.LAZY)
