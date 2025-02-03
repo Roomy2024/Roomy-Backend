@@ -3,7 +3,6 @@ plugins {
 	id 'application'
 	id 'org.springframework.boot' version '3.4.1'
 	id 'io.spring.dependency-management' version '1.1.7'
-
 }
 
 application {
@@ -30,32 +29,44 @@ repositories {
 }
 
 dependencies {
+	// Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
+	// Spring Boot 스타터들
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	// JWT 관련
 	implementation 'com.auth0:java-jwt:4.2.1'
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5' // JWT API
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'   // JWT 구현체
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5' // JSON 처리 (Jackson 사용)
+
+	// Servlet API
 	implementation 'javax.servlet:javax.servlet-api:4.0.1'
+
+	// MySQL Connector
 	implementation group: 'com.mysql', name: 'mysql-connector-j', version: '8.0.32'
+
+	// OpenAPI (springdoc)
 	implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.2.0'
+
+	// Firebase Admin
 	implementation 'com.google.firebase:firebase-admin:9.4.3'
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+	// AWS 관련 의존성 (S3 등)
 	implementation 'software.amazon.awssdk:s3:2.20.21'
 	implementation 'software.amazon.awssdk:auth:2.20.21'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	implementation 'com.amazonaws:aws-java-sdk-s3:1.12.526'
 
-	//	implementation 'org.springframework.boot:spring-boot-starter-websocket'
-	//	implementation 'com.fasterxml.jackson.core:jackson-databind'
+	// Test dependencies
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
