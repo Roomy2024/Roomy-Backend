@@ -1,13 +1,12 @@
 package com.example.Roomy.bookmark.service;
 
+import com.example.Roomy.SocialLogin.UserRepository;
 import com.example.Roomy.bookmark.dto.BookmarkDTO;
 import com.example.Roomy.bookmark.entity.BookmarkEntity;
 import com.example.Roomy.bookmark.repository.BookmarkRepository;
-import com.example.Roomy.bookmark.service.BookmarkService;
 import com.example.Roomy.community.entity.CommunityEntity;
 import com.example.Roomy.community.repository.CommunityRepository;
-import com.example.Roomy.SocialLogin.Model.User;
-import com.example.Roomy.SocialLogin.UserRepository;
+import com.example.Roomy.SocialLogin.Entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

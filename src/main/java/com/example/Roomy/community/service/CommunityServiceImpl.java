@@ -1,6 +1,7 @@
 package com.example.Roomy.community.service;
 
-import com.example.Roomy.SocialLogin.Model.User;
+import com.example.Roomy.SocialLogin.Entity.User;
+import com.example.Roomy.SocialLogin.UserRepository;
 import com.example.Roomy.community.dto.CommunityRequestDTO;
 import com.example.Roomy.community.dto.CommunityResponseDTO;
 import com.example.Roomy.community.entity.CommunityEntity;
@@ -9,7 +10,6 @@ import com.example.Roomy.image.entity.FileGroupEntity;
 import com.example.Roomy.image.entity.ImageEntity;
 import com.example.Roomy.image.repository.ImageRepository;
 import com.example.Roomy.image.service.FileService;
-import com.example.Roomy.SocialLogin.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

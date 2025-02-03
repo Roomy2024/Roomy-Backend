@@ -1,5 +1,6 @@
 package com.example.Roomy.like.service;
 
+import com.example.Roomy.SocialLogin.UserRepository;
 import com.example.Roomy.comment.entity.CommentEntity;
 import com.example.Roomy.comment.entity.ReplyEntity;
 import com.example.Roomy.comment.repository.CommentRepository;
@@ -8,8 +9,7 @@ import com.example.Roomy.community.entity.CommunityEntity;
 import com.example.Roomy.community.repository.CommunityRepository;
 import com.example.Roomy.like.entity.LikeEntity;
 import com.example.Roomy.like.repository.LikeRepository;
-import com.example.Roomy.SocialLogin.Model.User;
-import com.example.Roomy.SocialLogin.UserRepository;
+import com.example.Roomy.SocialLogin.Entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

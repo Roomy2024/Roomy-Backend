@@ -1,6 +1,6 @@
 package com.example.Roomy.comment.entity;
 
-import com.example.Roomy.SocialLogin.Model.User;
+import com.example.Roomy.SocialLogin.Entity.User;
 import com.example.Roomy.like.entity.LikeEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;

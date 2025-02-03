@@ -1,4 +1,4 @@
-package com.example.Roomy.SocialLogin.Model;
+package com.example.Roomy.SocialLogin.Entity;
 
 import com.example.Roomy.SocialLogin.UserRole;
 import lombok.Builder;

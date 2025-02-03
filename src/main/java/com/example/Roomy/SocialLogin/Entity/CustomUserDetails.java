@@ -1,4 +1,4 @@
-package com.example.Roomy.SocialLogin.Model;
+package com.example.Roomy.SocialLogin.Entity;
 
 import lombok.Builder;
 import org.springframework.security.core.GrantedAuthority;
