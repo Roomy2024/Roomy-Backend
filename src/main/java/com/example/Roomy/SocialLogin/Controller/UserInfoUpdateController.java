@@ -10,6 +10,9 @@ import com.example.Roomy.SocialLogin.Service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,17 +23,20 @@ public class UserInfoUpdateController {
     private final UserService userService;
 
     @PostMapping("/profile")
-    public ResponseEntity<String> updateUserProfile(@RequestBody UserProfileUpdateRequest userProfileUpdateRequest, @RequestHeader("Authorization") String token){
-        String jwtToken = token.replace("Bearer ", ""); // "Bearer " 제거
+    public ResponseEntity<String> updateUserProfile(
+            @RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
+            @RequestHeader("Authorization") String token) throws IOException {
+
+        String jwtToken = token.replace("Bearer ", "");
         Long userId = Long.parseLong(jwtTokenProvider.getUserIdFromToken(jwtToken));
 
-        User updateUser = userService.updateUserprofile(
-                userId,
-                userProfileUpdateRequest.getProfile());
-        return ResponseEntity.ok().body("프로필 변경이 완료되었습니다");
+        User updatedUser = userService.updateUserProfile(userId, profileImage);
+
+        return ResponseEntity.ok().body("프로필 이미지 변경이 완료되었습니다: " + updatedUser.getProfile());
     }
+
     @PostMapping("/username")
-    public ResponseEntity<String> upsdateUserName(@RequestBody UserNameUpdateRequest userNameUpdateRequest, @RequestHeader("Authorization") String token){
+    public ResponseEntity<String> updateUserName(@RequestBody UserNameUpdateRequest userNameUpdateRequest, @RequestHeader("Authorization") String token){
         String jwtToken = token.replace("Bearer ", ""); // "Bearer " 제거
         Long userId = Long.parseLong(jwtTokenProvider.getUserIdFromToken(jwtToken));
 
