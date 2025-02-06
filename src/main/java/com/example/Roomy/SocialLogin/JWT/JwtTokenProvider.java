@@ -1,7 +1,7 @@
 package com.example.Roomy.SocialLogin.JWT;
 
 import com.example.Roomy.SocialLogin.Entity.User;
-import com.example.Roomy.SocialLogin.UserRepository;
+import com.example.Roomy.SocialLogin.Repository.UserRepository;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -9,6 +9,7 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class JwtTokenProvider {
 
@@ -127,14 +129,19 @@ public class JwtTokenProvider {
 
     // Request의 Header에서 token 값 가져오기
     public String getTokenFromRequest(HttpServletRequest request) {
-        return request.getHeader("Authorization");
+        String token = request.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer ")) {
+
+            return token.substring(7); // "Bearer " 제거
+        }
+        return null;
     }
 
     //토큰에서 사용자ID 추출
     public String getUserIdFromToken(String token) {
         try{
             SignedJWT signedJWT = SignedJWT.parse(token);
-            return signedJWT.getJWTClaimsSet().getLongClaim("id").toString();
+            return String.valueOf(signedJWT.getJWTClaimsSet().getClaim("id"));
         }
         catch(Exception e){
             throw new RuntimeException("파싱 실패");

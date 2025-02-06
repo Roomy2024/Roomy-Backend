@@ -4,7 +4,7 @@ import com.example.Roomy.SocialLogin.Entity.CustomUserDetails;
 import com.example.Roomy.SocialLogin.Entity.OAuth2UserInfo;
 import com.example.Roomy.SocialLogin.Entity.User;
 import com.example.Roomy.SocialLogin.JWT.JwtTokenProvider;
-import com.example.Roomy.SocialLogin.UserRepository;
+import com.example.Roomy.SocialLogin.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -44,9 +44,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             if (userProvider.equals(provider)) {
                 log.info("로그인에 성공했습니다.");
 
-                //Access Token & Refresh Token 생성
-                String accessToken = jwtTokenProvider.createAccessToken(user.getId());
-                String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
+//                //Access Token & Refresh Token 생성
+//                String accessToken = jwtTokenProvider.createAccessToken(user.getId());
+//                String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
 
                 return new CustomUserDetails(user, oAuth2User.getAttributes());
             } else {

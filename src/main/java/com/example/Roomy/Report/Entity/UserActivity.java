@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum UserActivity {
     ACTIVITY("일반 유저"),
-    BAN("일시정지 유저");
+    BAN("정지 유저");
 
     private final String displayValue;
 }

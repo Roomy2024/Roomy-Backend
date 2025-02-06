@@ -1,10 +1,9 @@
 package com.example.Roomy.chat.service.groupchat;
 
-import com.example.Roomy.SocialLogin.UserRepository;
+import com.example.Roomy.SocialLogin.Repository.UserRepository;
 import com.example.Roomy.chat.dto.ChatMessageDTO;
 import com.example.Roomy.chat.dto.ChatRoomDTO;
 import com.example.Roomy.chat.util.TimeUtil;
-import com.example.Roomy.SocialLogin.Entity.User;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.*;
 import org.springframework.http.HttpStatus;

@@ -2,7 +2,7 @@ package com.example.Roomy.SocialLogin.Service;
 
 import com.example.Roomy.SocialLogin.Entity.User;
 import com.example.Roomy.SocialLogin.JWT.JwtTokenProvider;
-import com.example.Roomy.SocialLogin.UserRepository;
+import com.example.Roomy.SocialLogin.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

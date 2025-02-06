@@ -1,7 +1,7 @@
 package com.example.Roomy.community.service;
 
 import com.example.Roomy.SocialLogin.Entity.User;
-import com.example.Roomy.SocialLogin.UserRepository;
+import com.example.Roomy.SocialLogin.Repository.UserRepository;
 import com.example.Roomy.bookmark.repository.BookmarkRepository;
 import com.example.Roomy.comment.entity.CommentEntity;
 import com.example.Roomy.comment.repository.CommentRepository;
