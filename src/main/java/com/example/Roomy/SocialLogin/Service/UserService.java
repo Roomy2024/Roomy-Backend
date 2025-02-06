@@ -27,4 +27,25 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    @Transactional
+    public User updateUserprofile(Long id, String profile){
+        User user = userRepository.findById(id).orElseThrow(()->new IllegalStateException("사용자 정보가 없습니다."));
+
+        user.setProfile(profile);
+        return userRepository.save(user);
+    }
+    @Transactional
+    public User updateUserName(Long id, String username){
+        User user = userRepository.findById(id).orElseThrow(()->new IllegalStateException("사용자 정보가 없습니다."));
+
+        user.setProfile(username);
+        return userRepository.save(user);
+    }
+    @Transactional
+    public User updateUserArea(Long id, String area){
+        User user = userRepository.findById(id).orElseThrow(()->new IllegalStateException("사용자 정보가 없습니다."));
+
+        user.setProfile(area);
+        return userRepository.save(user);
+    }
 }
