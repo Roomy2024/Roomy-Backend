@@ -24,7 +24,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SuccessHandler implements AuthenticationSuccessHandler {
 
-    private static final String REDIRECT_URI = "http://localhost:3000/";
+    private static final String REDIRECT_URI = "http://localhost:3000/loginpage";
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
 

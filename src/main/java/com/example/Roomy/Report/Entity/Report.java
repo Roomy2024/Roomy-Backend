@@ -6,6 +6,8 @@ import com.example.Roomy.community.entity.CommunityEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
@@ -21,14 +23,15 @@ public class Report {
     private String type;
 
     @ManyToOne
-    @JoinColumn(name = "reporter_id", nullable = false)
-    //신고 한 사람
+    @JoinColumn(name = "reporter_id", nullable = true)
+    @OnDelete(action = OnDeleteAction.CASCADE) // 부모 삭제 시 CASCADE 또는 SET NULL 설정 가능
     private User reporter;
 
     @ManyToOne
-    @JoinColumn(name = "reported_id", nullable = false)
-    //신고 당한 사람
+    @JoinColumn(name = "reported_id", nullable = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private User reported;
+
 
     @ManyToOne
     @JoinColumn(name = "community_id", nullable = true) // 게시글 ID 저장
