@@ -42,18 +42,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             String userProvider = user.getProvider(); // 저장되어 있는 이메일의 provider를 가져옴
 
             if (userProvider.equals(provider)) {
-                log.info("로그인에 성공했습니다.");
+                log.info("provider={}로 로그인한 email={} 정보가 있습니다.",userProvider,oAuth2UserInfo.getEmail());
 
-//                //Access Token & Refresh Token 생성
-//                String accessToken = jwtTokenProvider.createAccessToken(user.getId());
-//                String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
-
-                return new CustomUserDetails(user, oAuth2User.getAttributes());
+                throw new OAuth2AuthenticationException("이미 회원가입 된 이메일입니다.");
             } else {
                 // provider가 다를 경우 예외
-                log.warn("이미 회원가입 된 이메일입니다: email={}, provider={}", oAuth2UserInfo.getEmail(), userProvider);
+                log.warn("이 이메일을 사용할 수 없습니다.: email={}, provider={}", oAuth2UserInfo.getEmail(), userProvider);
                 // 사용자에게 반환할 메세지
-                throw new OAuth2AuthenticationException("이미 회원가입 된 이메일입니다 " + userProvider + "로 로그인을 시도해주세요");
+                throw new OAuth2AuthenticationException("이 이메일을 사용할 수 없습니다. " + userProvider + "로 로그인을 시도해주세요");
             }
         }
 

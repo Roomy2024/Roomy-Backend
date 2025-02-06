@@ -75,12 +75,18 @@ public class SuccessHandler implements AuthenticationSuccessHandler {
         user.setRefreshToken(refreshToken);
         userRepository.save(user); // 사용자 정보 업데이트
 
-        log.info("Access Token 및 Refresh Token 생성 완료: userId = {}", user.getId());
+        log.info("Access Token 및 Refresh Token 생성 완료: userId = {}, username = {}", user.getId(), user.getUsername());
 
         // 클라이언트에 리다이렉트, 토큰 전달 (헤더로 전달)
-        response.sendRedirect(String.format("%s?access_token=%s&refresh_token=%s&userid=%d", REDIRECT_URI, accessToken, refreshToken, user.getId()));
+        response.sendRedirect(String.format(
+                "%s?access_token=%s&refresh_token=%s&userid=%d&username=%s",
+                REDIRECT_URI,
+                accessToken,
+                refreshToken,
+                user.getId(),
+                user.getUsername()
+        ));
     }
-
 
     private String extractEmailFromOAuth2User(String provider, OAuth2User oAuth2User) {
         switch (provider) {
