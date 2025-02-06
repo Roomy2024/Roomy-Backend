@@ -12,4 +12,5 @@ public interface PrivateChatService {
     String createChatRoom(String userId1, String userId2, ChatRoomDTO chatRoomDTO);
     void leaveRoom(String roomId, String userId);
     CompletableFuture<List<ChatMessageDTO>> getMessages(String roomId);
+    CompletableFuture<String> deleteMessage(String roomId, String messageId, String userId);
 }

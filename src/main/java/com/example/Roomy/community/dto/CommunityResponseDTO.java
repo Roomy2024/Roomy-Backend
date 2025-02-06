@@ -19,6 +19,7 @@ public class CommunityResponseDTO {
     private int views;
     private String author;
     private int likeCount;
+    private int totalCommentCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<String> imageUrls;
