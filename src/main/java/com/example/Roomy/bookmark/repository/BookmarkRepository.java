@@ -11,4 +11,6 @@ public interface BookmarkRepository extends JpaRepository<BookmarkEntity, Long> 
 
     // 'CommunityEntity'의 'communityId' 필드를 명시적으로 참조하도록 수정
     Optional<BookmarkEntity> findByUserIdAndCommunity_CommunityId(Long userId, Long communityId);
+
+    void deleteByCommunity_CommunityId(Long communityId);
 }

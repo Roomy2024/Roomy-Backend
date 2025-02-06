@@ -73,9 +73,8 @@ public class CommunityEntity {
     @Schema(description = "조회수")
     private int views = 0;
 
-    @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
-    @Schema(description = "좋아요")
+    @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LikeEntity> likes = new ArrayList<>();
 
 }

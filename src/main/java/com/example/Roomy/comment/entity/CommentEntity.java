@@ -60,10 +60,4 @@ public class CommentEntity {
     @Builder.Default
     @Schema(description = "대댓글")
     private List<ReplyEntity> replies = new ArrayList<>();
-
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL , orphanRemoval = true, fetch = FetchType.LAZY)
-    @Builder.Default
-    @Schema(description = "댓글 좋아요")
-    private List<LikeEntity> likes = new ArrayList<>();
-
 }
