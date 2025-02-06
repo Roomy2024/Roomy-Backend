@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -19,26 +20,18 @@ public class UserController {
 
     //추가 정보 저장
     @PostMapping("/update-userinfo")
-    public ResponseEntity<User> upsateUserInfo(@RequestBody UserRequest userRequest){
+    public ResponseEntity<User> upsateUserInfo(@RequestBody UserRequest userRequest, @RequestHeader("Authorization") String token){
+        String jwtToken = token.replace("Bearer ", ""); // "Bearer " 제거
+        Long userId = Long.parseLong(jwtTokenProvider.getUserIdFromToken(jwtToken));
+
         User updateUser = userService.updateUserInfo(
-                userRequest.getEmail(),
+                userId,
                 userRequest.getUsername(),
                 userRequest.getAge(),
                 userRequest.getArea(),
                 userRequest.getGender(),
                 userRequest.getProfile());
 
-        // 토큰 생성
-        String accessToken = jwtTokenProvider.createAccessToken(updateUser.getId());
-        String refreshToken = jwtTokenProvider.createRefreshToken(updateUser.getId());
-
-        // Refresh Token 저장
-        userService.saveRefreshToken(updateUser, refreshToken);
-
-        // 응답 헤더에 Access Token과 Refresh Token 추가
-        return ResponseEntity.ok()
-                .header("Authorization", "Bearer " + accessToken)
-                .header("Refresh-Token", refreshToken)
-                .body(updateUser);
+        return ResponseEntity.ok().body(updateUser);
     }
 }

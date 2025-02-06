@@ -1,13 +1,17 @@
 package com.example.Roomy.SocialLogin.Config;
 
+import com.example.Roomy.SocialLogin.Controller.SuccessHandler;
+import com.example.Roomy.SocialLogin.JWT.JwtAuthenticationFilter;
 import com.example.Roomy.SocialLogin.Service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -19,41 +23,51 @@ import java.util.List;
 @RequiredArgsConstructor
 public class Config {
 
+    private final SuccessHandler successHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable()) // CSRF 비활성화
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        http
+                .httpBasic(basic -> basic.disable())
+                .csrf(csrf -> csrf.disable())
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/**").permitAll() // 인증 API는 모두 허용
+                        .requestMatchers("/oauth2/authorization/kakao").permitAll()
+                        .requestMatchers("/auth/kakao/**").permitAll()
+                        .requestMatchers("/update-userinfo").permitAll()
+                        .requestMatchers("/report/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .anyRequest().permitAll() // 그 외 요청은 인증 필요
-                )
-                //.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // JWT 필터 추가
-                .oauth2Login(oauth2Login -> oauth2Login
-                        .userInfoEndpoint(userInfoEndpoint ->
-                                userInfoEndpoint.userService(customOAuth2UserService) // 사용자 정보 처리
-                        )
-                );
+                        .requestMatchers("/api/**").permitAll())
+
+
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // JWT 필터 추가
+                .oauth2Login(oauth2 -> {
+
+                    // 사용자 정보 로딩 시 커스텀 서비스 설정
+                    oauth2.userInfoEndpoint(userInfoEndpointConfig -> {
+                        userInfoEndpointConfig.userService(customOAuth2UserService); // 사용자 정보 처리
+                    });
+
+                    // 로그인 성공 시 핸들러 설정
+                    oauth2.successHandler(successHandler);
+                });
         return http.build();
     }
 
     //CORS
     @Bean
-    public CorsConfigurationSource corsConfigurationSource(){
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.setAllowedOrigins(List.of("http://localhost:3000"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setExposedHeaders(List.of("*"));
 
-        //쿠키, 인증정보 포함 허용
-        corsConfiguration.setAllowCredentials(true);
-        //허용할 프론트 주소 설정
-        corsConfiguration.setAllowedOrigins(List.of("http://localhost:3000"));
-        //허용할 GTTP 메서드 설정
-        corsConfiguration.setAllowedMethods(List.of("GET","POST","DELETE","OPTIONS"));
-        //허용할 요청 헤더 설정
-        corsConfiguration.setAllowedHeaders(List.of("*"));
-        //CORS 설정을 URL 패턴에 등록
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**",corsConfiguration);
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
 }
