@@ -32,6 +32,7 @@ public class Report {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User reported;
 
+
     @ManyToOne
     @JoinColumn(name = "community_id", nullable = true) // 게시글 ID 저장
     private CommunityEntity community;
