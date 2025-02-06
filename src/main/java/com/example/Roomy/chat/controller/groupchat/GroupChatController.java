@@ -6,6 +6,7 @@ import com.example.Roomy.chat.service.groupchat.GroupChatService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +54,21 @@ public class GroupChatController {
         return ResponseEntity.ok("Group chat room created with ID: " + roomId);
     }
 
+    @DeleteMapping("/room/{roomId}/message/{messageId}")
+    public CompletableFuture<ResponseEntity<String>> deleteGroupMessage(
+            @PathVariable String roomId,
+            @PathVariable String messageId,
+            @RequestParam String userId) {
+        return groupChatService.deleteGroupMessage(roomId, messageId, userId)
+                .thenApply(ResponseEntity::ok)
+                .exceptionally(ex -> {
+                    if (ex.getCause() instanceof ResponseStatusException) {
+                        ResponseStatusException rse = (ResponseStatusException) ex.getCause();
+                        return ResponseEntity.status(rse.getStatusCode()).body(rse.getReason());
+                    }
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("알 수 없는 오류 발생");
+                });
+    }
 
 
 

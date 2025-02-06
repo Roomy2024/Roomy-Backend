@@ -137,6 +137,52 @@ public class PrivateChatServiceImpl implements PrivateChatService {
         return roomId1;
     }
 
+    @Override
+    public CompletableFuture<String> deleteMessage(String roomId, String messageId, String userId) {
+        CompletableFuture<String> future = new CompletableFuture<>();
+
+        databaseReference.child(roomId).child("messages").child(messageId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot snapshot) {
+                        if (!snapshot.exists()) {
+                            future.completeExceptionally(new ResponseStatusException(
+                                    HttpStatus.NOT_FOUND, "메시지를 찾을 수 없습니다."));
+                            return;
+                        }
+
+                        // 작성자 검증
+                        String sender = snapshot.child("sender").getValue(String.class);
+                        if (sender == null || !sender.equals(userId)) {
+                            future.completeExceptionally(new ResponseStatusException(
+                                    HttpStatus.FORBIDDEN, "작성자만 메시지를 삭제할 수 있습니다."));
+                            return;
+                        }
+
+                        // 삭제된 메시지로 변경
+                        snapshot.getRef().child("content").setValue("삭제된 메세지 입니다", (error, ref) -> {
+                            if (error != null) {
+                                future.completeExceptionally(new ResponseStatusException(
+                                        HttpStatus.INTERNAL_SERVER_ERROR, "메시지 삭제 실패: " + error.getMessage()));
+                            } else {
+                                future.complete("메시지 내용이 '삭제된 메세지 입니다'로 업데이트되었습니다.");
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError error) {
+                        future.completeExceptionally(new RuntimeException(error.getMessage()));
+                    }
+                });
+
+        return future;
+    }
+
+
+
+
+
     // 방 나가기
     @Override
     public void leaveRoom(String roomId, String userId) {

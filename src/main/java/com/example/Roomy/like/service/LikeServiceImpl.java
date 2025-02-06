@@ -21,111 +21,50 @@ public class LikeServiceImpl implements LikeService {
     private final LikeRepository likeRepository;
     private final CommunityRepository communityRepository;
     private final UserRepository userRepository;
-    private final CommentRepository commentRepository;
-    private final ReplyRepository replyRepository;
 
     @Override
     @Transactional
-    public void toggleLike(Long id, Long userId, String type) {
+    public int toggleLike(Long communityId, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        LikeEntity likeEntity = null;
+        CommunityEntity community = communityRepository.findById(communityId)
+                .orElseThrow(() -> new IllegalArgumentException("Community not found"));
 
-        switch (type.toLowerCase()) {
-            case "community":
-                CommunityEntity community = communityRepository.findById(id)
-                        .orElseThrow(() -> new IllegalArgumentException("Community not found"));
-                likeEntity = likeRepository.findByCommunityAndUser(community, user).orElse(null);
+        LikeEntity likeEntity = likeRepository.findByCommunityAndUser(community, user).orElse(null);
 
-                if (likeEntity != null) {
-                    likeRepository.delete(likeEntity);
-                } else {
-                    likeEntity = LikeEntity.builder()
-                            .community(community)
-                            .user(user)
-                            .build();
-                    likeRepository.save(likeEntity);
-                }
-                break;
-
-            case "comment":
-                CommentEntity comment = commentRepository.findById(id)
-                        .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
-                likeEntity = likeRepository.findByCommentAndUser(comment, user).orElse(null);
-
-                if (likeEntity != null) {
-                    likeRepository.delete(likeEntity);
-                } else {
-                    likeEntity = LikeEntity.builder()
-                            .comment(comment)
-                            .user(user)
-                            .build();
-                    likeRepository.save(likeEntity);
-                }
-                break;
-
-            case "reply":
-                ReplyEntity reply = replyRepository.findById(id)
-                        .orElseThrow(() -> new IllegalArgumentException("Reply not found"));
-                likeEntity = likeRepository.findByReplyAndUser(reply, user).orElse(null);
-
-                if (likeEntity != null) {
-                    likeRepository.delete(likeEntity);
-                } else {
-                    likeEntity = LikeEntity.builder()
-                            .reply(reply)
-                            .user(user)
-                            .build();
-                    likeRepository.save(likeEntity);
-                }
-                break;
-
-            default:
-                throw new IllegalArgumentException("Invalid type. Must be 'community', 'comment', or 'reply'.");
-        }
-    }
-
-
-
-
-    @Override
-    public long countLikes(Long id, String type) {
-        switch (type.toLowerCase()) {
-            case "community":
-                return likeRepository.countByCommunity_CommunityId(id);
-            case "comment":
-                return likeRepository.countByComment_CommentId(id);
-            case "reply":
-                return likeRepository.countByReply_ReplyId(id);
-            default:
-                throw new IllegalArgumentException("Invalid type. Must be 'community', 'comment', or 'reply'.");
+        if (likeEntity != null) {
+            // 기존 좋아요가 있다면 상태를 반전
+            likeEntity.setIsLiked(likeEntity.getIsLiked() == 1 ? 0 : 1);
+            likeRepository.save(likeEntity);
+            return likeEntity.getIsLiked();
+        } else {
+            // 기존 기록이 없다면 새로 생성
+            likeEntity = LikeEntity.builder()
+                    .community(community)
+                    .user(user)
+                    .isLiked(1) // 처음 누르면 1
+                    .build();
+            likeRepository.save(likeEntity);
+            return 1;
         }
     }
 
     @Override
-    public boolean isLikedByUser(Long id, Long userId, String type) {
+    public long countLikes(Long communityId) {
+        return likeRepository.countByCommunity_CommunityId(communityId);
+    }
+
+    @Override
+    public int getLikeStatus(Long communityId, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        switch (type.toLowerCase()) {
-            case "community":
-                CommunityEntity community = communityRepository.findById(id)
-                        .orElseThrow(() -> new IllegalArgumentException("Community not found"));
-                return likeRepository.findByCommunityAndUser(community, user).isPresent();
+        CommunityEntity community = communityRepository.findById(communityId)
+                .orElseThrow(() -> new IllegalArgumentException("Community not found"));
 
-            case "comment":
-                CommentEntity comment = commentRepository.findById(id)
-                        .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
-                return likeRepository.findByCommentAndUser(comment, user).isPresent();
-
-            case "reply":
-                ReplyEntity reply = replyRepository.findById(id)
-                        .orElseThrow(() -> new IllegalArgumentException("Reply not found"));
-                return likeRepository.findByReplyAndUser(reply, user).isPresent();
-
-            default:
-                throw new IllegalArgumentException("Invalid type. Must be 'community', 'comment', or 'reply'.");
-        }
+        return likeRepository.findByCommunityAndUser(community, user)
+                .map(LikeEntity::getIsLiked)
+                .orElse(0);
     }
 }

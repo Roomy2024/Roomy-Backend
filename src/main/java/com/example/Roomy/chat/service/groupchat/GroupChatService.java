@@ -14,5 +14,5 @@ public interface GroupChatService {
     CompletableFuture<List<ChatMessageDTO>> getGroupMessages(String roomId);
     void addUserToGroupChat(String roomId, String userId);
     List<String> getUsersInGroupChat(String roomId);
-
+    CompletableFuture<String> deleteGroupMessage(String roomId, String messageId, String userId);
 }
