@@ -1,6 +1,6 @@
 package com.example.Roomy.bookmark.service;
 
-import com.example.Roomy.SocialLogin.UserRepository;
+import com.example.Roomy.SocialLogin.Repository.UserRepository;
 import com.example.Roomy.bookmark.dto.BookmarkDTO;
 import com.example.Roomy.bookmark.entity.BookmarkEntity;
 import com.example.Roomy.bookmark.repository.BookmarkRepository;

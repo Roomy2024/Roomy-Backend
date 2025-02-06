@@ -1,6 +1,5 @@
 package com.example.Roomy.SocialLogin.Entity;
 
-import com.example.Roomy.SocialLogin.UserRole;
 import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
