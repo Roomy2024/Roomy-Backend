@@ -17,10 +17,11 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final FileService fileService;
+    private final FirebaseTokenService firebaseTokenService;
 
     @Transactional
     public User updateUserInfo(Long id, String username, int age, String area, String gender, String profile){
-        User user = userRepository.findById(id).orElseThrow(()->new IllegalStateException("사용자 정보가 없습니다."));
+        User user = userRepository.findById(id).orElseThrow(() -> new IllegalStateException("사용자 정보가 없습니다."));
 
         user.setUsername(username);
         user.setAge(age);
@@ -28,6 +29,10 @@ public class UserService {
         user.setGender(gender);
         user.setProfile(profile);
         user.setRole(UserRole.MEMBER);
+
+        // FirebaseTokenService의 메서드 호출
+        String fcmToken = firebaseTokenService.generateFirebaseToken(user.getId().toString());
+        user.setFcmToken(fcmToken);
 
         return userRepository.save(user);
     }
