@@ -17,7 +17,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final FileService fileService;
-    private final FirebaseTokenService firebaseTokenService;
 
     @Transactional
     public User updateUserInfo(Long id, String username, int age, String area, String gender, MultipartFile profileImage) {
@@ -42,11 +41,6 @@ public class UserService {
                 throw new RuntimeException("프로필 이미지 업로드 실패: " + e.getMessage(), e);
             }
         }
-
-        // ✅ FirebaseTokenService의 메서드 호출
-        String fcmToken = firebaseTokenService.generateFirebaseToken(user.getId().toString());
-        user.setFcmToken(fcmToken);
-
         return userRepository.save(user);
     }
 

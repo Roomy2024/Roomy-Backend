@@ -8,6 +8,8 @@ import com.example.Roomy.notification.repository.NotificationRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.example.Roomy.notification.service.FCMService;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +21,7 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final FCMService fcmService;
 
     /**
      * 특정 사용자의 알림 목록 조회
@@ -70,6 +73,7 @@ public class NotificationService {
     /**
      * 알림 생성 및 저장
      */
+
     @Transactional
     public void sendNotification(Long senderId, Long receiverId, String message) {
         User sender = userRepository.findById(senderId)
@@ -77,6 +81,7 @@ public class NotificationService {
         User receiver = userRepository.findById(receiverId)
                 .orElseThrow(() -> new IllegalArgumentException("Receiver not found"));
 
+        // **DB에 알림 저장**
         NotificationEntity notification = NotificationEntity.builder()
                 .user(receiver) // 알림 수신자
                 .sender(sender) // 알림 발신자
@@ -85,5 +90,27 @@ public class NotificationService {
                 .build();
 
         notificationRepository.save(notification);
+
+        // **FCM 토큰 유효성 검사**
+        String fcmToken = receiver.getFcmToken();
+        if (StringUtils.isBlank(fcmToken)) { // ✅ null, 빈 값 체크
+            System.err.println("❌ 알림 전송 실패: 수신자의 FCM 토큰이 없습니다. / 개발중");
+            return;
+        }
+
+        // **FCM 토큰 형식 검증 (예제: 길이가 140자 이상인지 체크)**
+        if (fcmToken.length() < 140) {
+            System.err.println("❌ 알림 전송 실패: 유효하지 않은 FCM 토큰 / 개발중");
+            return;
+        }
+
+        // **푸시 알림 전송**
+        try {
+            fcmService.sendPushNotification(fcmToken, "새로운 알림", message);
+            System.out.println("✅ FCM 알림 전송 성공: " + message);
+        } catch (Exception e) {
+            System.err.println("❌ FCM 알림 전송 실패: " + e.getMessage());
+        }
     }
+
 }
