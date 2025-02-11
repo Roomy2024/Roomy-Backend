@@ -9,6 +9,8 @@ import com.example.Roomy.comment.repository.CommentRepository;
 import com.example.Roomy.comment.repository.ReplyRepository;
 import com.example.Roomy.community.entity.CommunityEntity;
 import com.example.Roomy.community.repository.CommunityRepository;
+import com.example.Roomy.notification.repository.NotificationRepository;
+import com.example.Roomy.notification.service.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ public class CommentServiceImpl implements CommentService {
     private final ReplyRepository replyRepository;
     private final CommunityRepository communityRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional
@@ -39,6 +42,15 @@ public class CommentServiceImpl implements CommentService {
                 .content(commentRequestDTO.getContent())
                 .build();
         CommentEntity savedComment = commentRepository.save(comment);
+
+        // 본인이 자신의 커뮤니티에 댓글을 달았을 경우 알림을 보내지 않음
+        if (!user.getId().equals(community.getAuthor().getId())) {
+            notificationService.sendNotification( // ✅ 인스턴스 메서드 호출
+                    user.getId(),
+                    community.getAuthor().getId(),
+                    "[댓글 알림] " + community.getTitle() + " 에 " + user.getUsername() + "님이 댓글을 남겼습니다: " + commentRequestDTO.getContent()
+            );
+        }
 
         return toCommentResponseDTO(savedComment);
     }

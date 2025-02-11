@@ -19,6 +19,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -59,7 +62,7 @@ public class CommunityServiceImpl implements CommunityService {
         FileGroupEntity fileGroup = new FileGroupEntity();
         if (communityRequestDTO.getImages() != null && !communityRequestDTO.getImages().isEmpty()) {
             for (MultipartFile file : communityRequestDTO.getImages()) {
-                String fileUrl = fileService.uploadImageToS3(file, 800, 600);
+                String fileUrl = fileService.uploadCommunityImageToS3(file);
                 ImageEntity imageEntity = ImageEntity.builder()
                         .imageUrl(fileUrl)
                         .fileGroup(fileGroup)
@@ -107,7 +110,7 @@ public class CommunityServiceImpl implements CommunityService {
 
         if (communityRequestDTO.getImages() != null && !communityRequestDTO.getImages().isEmpty()) {
             for (MultipartFile file : communityRequestDTO.getImages()) {
-                String filePath = fileService.uploadImageToS3(file, 800, 600);
+                String filePath = fileService.uploadCommunityImageToS3(file);
                 ImageEntity imageEntity = ImageEntity.builder()
                         .imageUrl(filePath)
                         .fileGroup(fileGroup)
@@ -141,14 +144,17 @@ public class CommunityServiceImpl implements CommunityService {
     }
 
     @Override
-    public List<CommunityResponseDTO> getAllCommunities() {
-        return communityRepository.findAll().stream()
-                .map(community -> {
-                    int totalCommentCount = getTotalCommentCount(community.getCommunityId());
-                    return toResponseDTO(community, totalCommentCount);
-                })
+    public Page<CommunityResponseDTO> getAllCommunities(Pageable pageable) {
+        Page<CommunityEntity> communityPage = communityRepository.findAll(pageable);
+
+        List<CommunityResponseDTO> communityResponseDTOList = communityPage.getContent().stream()
+                .map(community -> toResponseDTO(community, getTotalCommentCount(community.getCommunityId()))) // ✅ 람다식 사용
                 .collect(Collectors.toList());
+
+        return new PageImpl<>(communityResponseDTOList, pageable, communityPage.getTotalElements());
     }
+
+
 
     @Override
     @Transactional

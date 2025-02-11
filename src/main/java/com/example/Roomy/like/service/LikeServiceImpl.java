@@ -10,6 +10,7 @@ import com.example.Roomy.community.repository.CommunityRepository;
 import com.example.Roomy.like.entity.LikeEntity;
 import com.example.Roomy.like.repository.LikeRepository;
 import com.example.Roomy.SocialLogin.Entity.User;
+import com.example.Roomy.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ public class LikeServiceImpl implements LikeService {
     private final LikeRepository likeRepository;
     private final CommunityRepository communityRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional
@@ -34,18 +36,35 @@ public class LikeServiceImpl implements LikeService {
         LikeEntity likeEntity = likeRepository.findByCommunityAndUser(community, user).orElse(null);
 
         if (likeEntity != null) {
-            // 기존 좋아요가 있다면 상태를 반전
             likeEntity.setIsLiked(likeEntity.getIsLiked() == 1 ? 0 : 1);
             likeRepository.save(likeEntity);
+
+            // 본인이 자신의 글에 좋아요를 눌렀을 경우 알림을 보내지 않음
+            if (likeEntity.getIsLiked() == 1 && !user.getId().equals(community.getAuthor().getId())) {
+                notificationService.sendNotification( // ✅ 인스턴스 메서드 호출
+                        user.getId(),
+                        community.getAuthor().getId(),
+                        "[좋아요 알림] " + user.getUsername() + "님이 " + community.getTitle() + " 글에 좋아요를 눌렀습니다."
+                );
+            }
+
             return likeEntity.getIsLiked();
         } else {
-            // 기존 기록이 없다면 새로 생성
             likeEntity = LikeEntity.builder()
                     .community(community)
                     .user(user)
-                    .isLiked(1) // 처음 누르면 1
+                    .isLiked(1)
                     .build();
             likeRepository.save(likeEntity);
+
+            if (!user.getId().equals(community.getAuthor().getId())) {
+                notificationService.sendNotification( // ✅ 인스턴스 메서드 호출
+                        user.getId(),
+                        community.getAuthor().getId(),
+                        "[좋아요 알림] " + user.getUsername() + "님이 " + community.getTitle() + " 글에 좋아요를 눌렀습니다."
+                );
+            }
+
             return 1;
         }
     }

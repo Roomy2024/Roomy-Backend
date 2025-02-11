@@ -8,6 +8,9 @@ import com.example.Roomy.SocialLogin.Service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,20 +19,18 @@ public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
 
+    // 멀티파트폼으로 해야함
     //추가 정보 저장
-    @PostMapping("/update-userinfo")
-    public ResponseEntity<User> upsateUserInfo(@RequestBody UserRequest userRequest, @RequestParam("id") Long id){
-        // ID로 사용자 조회
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("해당 ID의 사용자를 찾을 수 없습니다."));
+    @PostMapping(value = "/update-userinfo", consumes = {"multipart/form-data"})
+    public ResponseEntity<User> updateUserInfo(
+            @RequestParam("id") Long id,
+            @RequestParam("username") String username,
+            @RequestParam("age") int age,
+            @RequestParam("area") String area,
+            @RequestParam("gender") String gender,
+            @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws IOException {
 
-        User updateUser = userService.updateUserInfo(
-                id,
-                userRequest.getUsername(),
-                userRequest.getAge(),
-                userRequest.getArea(),
-                userRequest.getGender(),
-                userRequest.getProfile());
-
+        User updateUser = userService.updateUserInfo(id, username, age, area, gender, profileImage);
         return ResponseEntity.ok().body(updateUser);
     }
 }
