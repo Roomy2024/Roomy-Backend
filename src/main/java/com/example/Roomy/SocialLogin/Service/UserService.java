@@ -20,41 +20,61 @@ public class UserService {
     private final FirebaseTokenService firebaseTokenService;
 
     @Transactional
-    public User updateUserInfo(Long id, String username, int age, String area, String gender, String profile){
-        User user = userRepository.findById(id).orElseThrow(() -> new IllegalStateException("사용자 정보가 없습니다."));
+    public User updateUserInfo(Long id, String username, int age, String area, String gender, MultipartFile profileImage) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalStateException("사용자 정보가 없습니다."));
 
         user.setUsername(username);
         user.setAge(age);
         user.setArea(area);
         user.setGender(gender);
-        user.setProfile(profile);
         user.setRole(UserRole.MEMBER);
 
-        // FirebaseTokenService의 메서드 호출
+        // ✅ 프로필 이미지가 있다면 S3에 업로드 (예외 처리 추가)
+        if (profileImage != null && !profileImage.isEmpty()) {
+            try {
+                if (user.getProfile() != null) {
+                    fileService.deleteFileFromS3(user.getProfile()); // 기존 프로필 삭제
+                }
+                String profileImageUrl = fileService.uploadUserProfileImageToS3(profileImage);
+                user.setProfile(profileImageUrl);
+            } catch (IOException e) {
+                throw new RuntimeException("프로필 이미지 업로드 실패: " + e.getMessage(), e);
+            }
+        }
+
+        // ✅ FirebaseTokenService의 메서드 호출
         String fcmToken = firebaseTokenService.generateFirebaseToken(user.getId().toString());
         user.setFcmToken(fcmToken);
 
         return userRepository.save(user);
     }
 
+
     @Transactional
-    public User updateUserProfile(Long id, MultipartFile profileImage) throws IOException {
-        User user = userRepository.findById(id).orElseThrow(() -> new IllegalStateException("사용자 정보가 없습니다."));
+    public User updateUserProfile(Long id, MultipartFile profileImage) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalStateException("사용자 정보가 없습니다."));
 
         String profileImageUrl;
 
-        if (profileImage != null && !profileImage.isEmpty()) {
-            if (user.getProfile() != null) {
-                fileService.deleteFileFromS3(user.getProfile());
+        try {
+            if (profileImage != null && !profileImage.isEmpty()) {
+                if (user.getProfile() != null) {
+                    fileService.deleteFileFromS3(user.getProfile());
+                }
+                profileImageUrl = fileService.uploadUserProfileImageToS3(profileImage);
+            } else {
+                profileImageUrl = fileService.uploadDefaultProfileImageToS3();
             }
-            profileImageUrl = fileService.uploadImageToS3(profileImage, 300, 300);
-        } else {
-            profileImageUrl = fileService.uploadDefaultProfileImageToS3();
+        } catch (IOException e) {
+            throw new RuntimeException("프로필 이미지 업로드 실패: " + e.getMessage(), e);
         }
 
         user.setProfile(profileImageUrl);
         return userRepository.save(user);
     }
+
 
     @Transactional
     public User updateUserName(Long id, String username){

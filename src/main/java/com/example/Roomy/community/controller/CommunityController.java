@@ -8,6 +8,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,6 +55,7 @@ public class CommunityController {
             @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없음"),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
+
     @GetMapping("/{id}")
     public ResponseEntity<CommunityResponseDTO> getCommunity(
             @Parameter(description = "게시글 ID") @PathVariable Long id) {
@@ -59,15 +63,14 @@ public class CommunityController {
         return ResponseEntity.ok(communityService.getCommunity(id));
     }
 
-    @Operation(summary = "전체 커뮤니티 게시글 조회", description = "등록된 모든 커뮤니티 게시글을 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "게시글 목록 조회 성공"),
-            @ApiResponse(responseCode = "500", description = "서버 오류")
-    })
+    @Operation(summary = "전체 커뮤니티 게시글 조회 (페이징)", description = "등록된 모든 커뮤니티 게시글을 10개씩 페이지로 조회합니다.")
     @GetMapping("/getall")
-    public ResponseEntity<List<CommunityResponseDTO>> getAllCommunities() {
-        return ResponseEntity.ok(communityService.getAllCommunities());
+    public ResponseEntity<Page<CommunityResponseDTO>> getAllCommunities(
+            @RequestParam(defaultValue = "0") int page) {
+        Pageable pageable = PageRequest.of(page, 10); // ✅ 10개씩 페이징
+        return ResponseEntity.ok(communityService.getAllCommunities(pageable));
     }
+
 
     @Operation(summary = "사용자의 커뮤니티 게시글 조회", description = "특정 사용자가 작성한 커뮤니티 게시글 목록을 조회합니다.")
     @ApiResponses({
