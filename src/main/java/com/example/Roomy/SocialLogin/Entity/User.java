@@ -42,6 +42,8 @@ public class User {
     //신고 수가 일정 수를 넘으면 임시정지 or 정지
     private int ReportCount;
 
+    @Column(nullable = true,length = 2048)
+    private String fcmToken;
 
     @OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Report> reporter;  // 사용자가 신고한 기록
