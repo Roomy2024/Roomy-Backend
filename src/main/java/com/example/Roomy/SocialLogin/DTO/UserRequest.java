@@ -1,6 +1,7 @@
 package com.example.Roomy.SocialLogin.DTO;
 
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 public class UserRequest {
@@ -9,5 +10,5 @@ public class UserRequest {
     private int age;
     private String area;
     private String gender;
-    private String profile;
+    private MultipartFile profileImage;
 }
