@@ -29,7 +29,7 @@ public class UserService {
         user.setGender(gender);
         user.setRole(UserRole.MEMBER);
 
-        // ✅ 프로필 이미지가 있다면 S3에 업로드 (예외 처리 추가)
+        //프로필 이미지가 있다면 S3에 업로드 (예외 처리 추가)
         if (profileImage != null && !profileImage.isEmpty()) {
             try {
                 if (user.getProfile() != null) {
@@ -41,48 +41,6 @@ public class UserService {
                 throw new RuntimeException("프로필 이미지 업로드 실패: " + e.getMessage(), e);
             }
         }
-        return userRepository.save(user);
-    }
-
-
-    @Transactional
-    public User updateUserProfile(Long id, MultipartFile profileImage) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalStateException("사용자 정보가 없습니다."));
-
-        String profileImageUrl;
-
-        try {
-            if (profileImage != null && !profileImage.isEmpty()) {
-                if (user.getProfile() != null) {
-                    fileService.deleteFileFromS3(user.getProfile());
-                }
-                profileImageUrl = fileService.uploadUserProfileImageToS3(profileImage);
-            } else {
-                profileImageUrl = fileService.uploadDefaultProfileImageToS3();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("프로필 이미지 업로드 실패: " + e.getMessage(), e);
-        }
-
-        user.setProfile(profileImageUrl);
-        return userRepository.save(user);
-    }
-
-
-    @Transactional
-    public User updateUserName(Long id, String username){
-        User user = userRepository.findById(id).orElseThrow(()->new IllegalStateException("사용자 정보가 없습니다."));
-
-        user.setUsername(username);
-        return userRepository.save(user);
-    }
-
-    @Transactional
-    public User updateUserArea(Long id, String area){
-        User user = userRepository.findById(id).orElseThrow(()->new IllegalStateException("사용자 정보가 없습니다."));
-
-        user.setArea(area);
         return userRepository.save(user);
     }
 }

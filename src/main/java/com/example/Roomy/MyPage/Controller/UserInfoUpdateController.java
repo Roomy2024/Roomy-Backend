@@ -1,9 +1,8 @@
-package com.example.Roomy.SocialLogin.Controller;
+package com.example.Roomy.MyPage.Controller;
 
+import com.example.Roomy.MyPage.Service.UserInfoUpdateService;
 import com.example.Roomy.SocialLogin.DTO.UserAreaUpdateRequest;
 import com.example.Roomy.SocialLogin.DTO.UserNameUpdateRequest;
-import com.example.Roomy.SocialLogin.DTO.UserRequest;
-import com.example.Roomy.SocialLogin.DTO.UserProfileUpdateRequest;
 import com.example.Roomy.SocialLogin.Entity.User;
 import com.example.Roomy.SocialLogin.JWT.JwtTokenProvider;
 import com.example.Roomy.SocialLogin.Service.UserService;
@@ -16,11 +15,11 @@ import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/update")
+@RequestMapping("/mypage/update")
 public class UserInfoUpdateController {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserService userService;
+    private final UserInfoUpdateService userInfoUpdateService;
 
     @PostMapping("/profile")
     public ResponseEntity<String> updateUserProfile(
@@ -30,7 +29,7 @@ public class UserInfoUpdateController {
         String jwtToken = token.replace("Bearer ", "");
         Long userId = Long.parseLong(jwtTokenProvider.getUserIdFromToken(jwtToken));
 
-        User updatedUser = userService.updateUserProfile(userId, profileImage);
+        User updatedUser = userInfoUpdateService.updateUserProfile(userId, profileImage);
 
         return ResponseEntity.ok().body("프로필 이미지 변경이 완료되었습니다: " + updatedUser.getProfile());
     }
@@ -40,7 +39,7 @@ public class UserInfoUpdateController {
         String jwtToken = token.replace("Bearer ", ""); // "Bearer " 제거
         Long userId = Long.parseLong(jwtTokenProvider.getUserIdFromToken(jwtToken));
 
-        User updateUser = userService.updateUserName(
+        User updateUser = userInfoUpdateService.updateUserName(
                 userId,
                 userNameUpdateRequest.getUsername());
         return ResponseEntity.ok().body("닉네임 변경이 완료되었습니다.");
@@ -50,7 +49,7 @@ public class UserInfoUpdateController {
         String jwtToken = token.replace("Bearer ", ""); // "Bearer " 제거
         Long userId = Long.parseLong(jwtTokenProvider.getUserIdFromToken(jwtToken));
 
-        User updateUser = userService.updateUserArea(
+        User updateUser = userInfoUpdateService.updateUserArea(
                 userId,
                 userAreaUpdateRequest.getArea());
         return ResponseEntity.ok().body("지역 변경이 완료되었습니다.");
