@@ -1,6 +1,7 @@
 package com.example.Roomy.Report.Entity;
 
 import com.example.Roomy.SocialLogin.Entity.User;
+import com.example.Roomy.SocialLogin.Entity.UserRole;
 import com.example.Roomy.comment.entity.CommentEntity;
 import com.example.Roomy.community.entity.CommunityEntity;
 import jakarta.persistence.*;
@@ -21,6 +22,9 @@ public class Report {
 
     //신고 타입 ex)채팅, 개시글, 댓글
     private String type;
+
+    @Convert(converter = ReportReasonConverter.class)
+    private ReportReason reportReason;
 
     @ManyToOne
     @JoinColumn(name = "reporter_id", nullable = true)

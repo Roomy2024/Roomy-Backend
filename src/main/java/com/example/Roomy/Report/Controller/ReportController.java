@@ -1,5 +1,7 @@
 package com.example.Roomy.Report.Controller;
 
+import com.example.Roomy.Report.DTO.ReportRequest;
+import com.example.Roomy.Report.Entity.ReportReason;
 import com.example.Roomy.Report.Repository.ReportRepository;
 import com.example.Roomy.Report.Service.ReportService;
 import com.example.Roomy.SocialLogin.JWT.JwtTokenProvider;
@@ -25,13 +27,21 @@ public class ReportController {
 
 
     @PostMapping("/{type}/{id}")
-    public ResponseEntity<String> report(@PathVariable String type, @RequestHeader("id") Long targetId, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<String> report(
+            @PathVariable String type,
+            @RequestHeader("id") Long targetId,
+            @RequestHeader("Authorization") String token,
+            @RequestBody ReportRequest reportRequest) {
+
         //JWT 토큰에서 신고한 사용자 ID 추출
         String jwtToken = token.replace("Bearer ", ""); // "Bearer " 제거
         Long reporterId = Long.parseLong(jwtTokenProvider.getUserIdFromToken(jwtToken));
 
+        // ReportReason Enum 값 가져오기
+        ReportReason reportReason = reportRequest.toEnum();
+
         //Report 저장
-        reportService.saveReport(type, reporterId, targetId );
+        reportService.saveReport(type, reporterId, targetId, reportReason);
 
         return ResponseEntity.ok("신고가 정상적으로 접수되었습니다.");
     }
