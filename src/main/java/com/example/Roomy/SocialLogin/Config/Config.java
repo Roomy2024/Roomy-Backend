@@ -52,6 +52,7 @@ public class Config {
                         .requestMatchers("/bookmarks/**").permitAll()
                         .requestMatchers("/api/**").permitAll()
                         .requestMatchers("/notifications/**").permitAll()
+                        .requestMatchers("/mypage/**").permitAll()
                         // 그 외 모든 요청은 인증 필요
                         .anyRequest().authenticated()
                 )

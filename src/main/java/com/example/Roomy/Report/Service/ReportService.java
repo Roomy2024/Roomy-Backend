@@ -1,6 +1,7 @@
 package com.example.Roomy.Report.Service;
 
 import com.example.Roomy.Report.Entity.Report;
+import com.example.Roomy.Report.Entity.ReportReason;
 import com.example.Roomy.Report.Entity.UserActivity;
 import com.example.Roomy.Report.Repository.ReportRepository;
 import com.example.Roomy.SocialLogin.Entity.User;
@@ -25,10 +26,9 @@ public class ReportService {
     private final CommentRepository commentRepository;
 
     @Transactional
-    public Report saveReport(String type, Long reporterId,  Long targetId) {
+    public Report saveReport(String type, Long reporterId,  Long targetId, ReportReason reportReason) {
         // ID를 이용해 실제 User 객체 조회
-        User reporter = userRepository.findById(reporterId)
-                .orElseThrow(() -> new RuntimeException("신고자를 찾을 수 없습니다."));
+        User reporter = userRepository.findById(reporterId).orElseThrow(() -> new RuntimeException("신고자를 찾을 수 없습니다."));
 
         Report report = new Report();
         User reported = null;
@@ -36,10 +36,14 @@ public class ReportService {
         switch (type) {
             case "community":
                 reported = handleCommunityReport(report,targetId);
+                if(reported==reporter)
+                    throw new RuntimeException("본인은 신고할 수 없습니다.");
                 break;
 
             case "comments":
                 reported = handleCommentReport(report,targetId);
+                if(reported==reporter)
+                    throw new RuntimeException("본인은 신고할 수 없습니다.");
                 break;
 
             default:
@@ -55,12 +59,13 @@ public class ReportService {
             throw new RuntimeException("이미 신고한 이력이 있습니다.");
         }
 
-        return createReport(type, reporter, reported, report);
+        return createReport(type, reporter, reported, report, reportReason);
     }
 
     // 신고 생성
-    private Report createReport(String type, User reporter, User reported, Report report) {
+    private Report createReport(String type, User reporter, User reported, Report report, ReportReason reportReason) {
         report.setType(type);
+        report.setReportReason(reportReason);
         report.setReporter(reporter);
         report.setReported(reported);
         report.setLocalDateTime(LocalDateTime.now());
