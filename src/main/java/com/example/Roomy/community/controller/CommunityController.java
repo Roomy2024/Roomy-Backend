@@ -12,9 +12,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -63,12 +66,16 @@ public class CommunityController {
         return ResponseEntity.ok(communityService.getCommunity(id));
     }
 
-    @Operation(summary = "전체 커뮤니티 게시글 조회 (페이징)", description = "등록된 모든 커뮤니티 게시글을 10개씩 페이지로 조회합니다.")
+    @Operation(summary = "커뮤니티 게시글 조회 (무한 스크롤)", description = "등록된 모든 커뮤니티 게시글을 10개씩 페이징하여 조회합니다. 특정 type을 입력하면 해당 type이 포함된 게시글을 조회합니다.")
     @GetMapping("/getall")
     public ResponseEntity<Page<CommunityResponseDTO>> getAllCommunities(
-            @RequestParam(defaultValue = "0") int page) {
-        Pageable pageable = PageRequest.of(page, 10); // ✅ 10개씩 페이징
-        return ResponseEntity.ok(communityService.getAllCommunities(pageable));
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "전체") String type
+    ) {
+        Pageable pageable = PageRequest.of(page, 10); // ✅ 10개씩 데이터 로드
+        Page<CommunityResponseDTO> response = communityService.getAllCommunities(type, pageable);
+
+        return ResponseEntity.ok(response);
     }
 
 

@@ -22,6 +22,7 @@ public class UserController {
     @PostMapping(value = "/update-userinfo")
     public ResponseEntity<User> updateUserInfo(@ModelAttribute UserRequest userRequest) throws IOException {
         User updatedUser = userService.updateUserInfo(userRequest);
+        System.out.println(userRequest);
         return ResponseEntity.ok().body(updatedUser);
     }
 }
