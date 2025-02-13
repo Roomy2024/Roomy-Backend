@@ -62,7 +62,7 @@ public class CommunityServiceImpl implements CommunityService {
         FileGroupEntity fileGroup = new FileGroupEntity();
         if (communityRequestDTO.getImages() != null && !communityRequestDTO.getImages().isEmpty()) {
             for (MultipartFile file : communityRequestDTO.getImages()) {
-                String fileUrl = fileService.uploadCommunityImageToS3(file);
+                String fileUrl = fileService.uploadCommunityImageToS3(file, communityRequestDTO.getTitle());
                 ImageEntity imageEntity = ImageEntity.builder()
                         .imageUrl(fileUrl)
                         .fileGroup(fileGroup)
@@ -110,7 +110,7 @@ public class CommunityServiceImpl implements CommunityService {
 
         if (communityRequestDTO.getImages() != null && !communityRequestDTO.getImages().isEmpty()) {
             for (MultipartFile file : communityRequestDTO.getImages()) {
-                String filePath = fileService.uploadCommunityImageToS3(file);
+                String filePath = fileService.uploadCommunityImageToS3(file, communityRequestDTO.getTitle());
                 ImageEntity imageEntity = ImageEntity.builder()
                         .imageUrl(filePath)
                         .fileGroup(fileGroup)

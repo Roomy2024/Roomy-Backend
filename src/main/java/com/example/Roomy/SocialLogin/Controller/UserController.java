@@ -19,18 +19,9 @@ public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
 
-    // 멀티파트폼으로 해야함
-    //추가 정보 저장
-    @PostMapping(value = "/update-userinfo", consumes = {"multipart/form-data"})
-    public ResponseEntity<User> updateUserInfo(
-            @RequestParam("id") Long id,
-            @RequestParam("username") String username,
-            @RequestParam("age") int age,
-            @RequestParam("area") String area,
-            @RequestParam("gender") String gender,
-            @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws IOException {
-
-        User updateUser = userService.updateUserInfo(id, username, age, area, gender, profileImage);
-        return ResponseEntity.ok().body(updateUser);
+    @PostMapping(value = "/update-userinfo")
+    public ResponseEntity<User> updateUserInfo(@ModelAttribute UserRequest userRequest) throws IOException {
+        User updatedUser = userService.updateUserInfo(userRequest);
+        return ResponseEntity.ok().body(updatedUser);
     }
 }

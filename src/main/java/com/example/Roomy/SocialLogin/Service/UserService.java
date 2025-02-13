@@ -1,5 +1,6 @@
 package com.example.Roomy.SocialLogin.Service;
 
+import com.example.Roomy.SocialLogin.DTO.UserRequest;
 import com.example.Roomy.SocialLogin.Entity.User;
 import com.example.Roomy.SocialLogin.Repository.UserRepository;
 import com.example.Roomy.SocialLogin.Entity.UserRole;
@@ -19,23 +20,25 @@ public class UserService {
     private final FileService fileService;
 
     @Transactional
-    public User updateUserInfo(Long id, String username, int age, String area, String gender, MultipartFile profileImage) {
-        User user = userRepository.findById(id)
+    public User updateUserInfo(UserRequest userRequest) {
+        User user = userRepository.findById(userRequest.getId())
                 .orElseThrow(() -> new IllegalStateException("사용자 정보가 없습니다."));
 
-        user.setUsername(username);
-        user.setAge(age);
-        user.setArea(area);
-        user.setGender(gender);
+        user.setUsername(userRequest.getUsername());
+        user.setAge(userRequest.getAge());
+        user.setArea(userRequest.getArea());
+        user.setGender(userRequest.getGender());
         user.setRole(UserRole.MEMBER);
 
-        // ✅ 프로필 이미지가 있다면 S3에 업로드 (예외 처리 추가)
+        MultipartFile profileImage = userRequest.getProfileImage();
+
+        // ✅ 프로필 이미지가 있다면 S3에 업로드
         if (profileImage != null && !profileImage.isEmpty()) {
             try {
                 if (user.getProfile() != null) {
                     fileService.deleteFileFromS3(user.getProfile()); // 기존 프로필 삭제
                 }
-                String profileImageUrl = fileService.uploadUserProfileImageToS3(profileImage);
+                String profileImageUrl = fileService.uploadUserProfileImageToS3(profileImage, user.getId());
                 user.setProfile(profileImageUrl);
             } catch (IOException e) {
                 throw new RuntimeException("프로필 이미지 업로드 실패: " + e.getMessage(), e);
@@ -44,28 +47,22 @@ public class UserService {
         return userRepository.save(user);
     }
 
-
     @Transactional
     public User updateUserProfile(Long id, MultipartFile profileImage) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalStateException("사용자 정보가 없습니다."));
 
-        String profileImageUrl;
-
-        try {
-            if (profileImage != null && !profileImage.isEmpty()) {
+        if (profileImage != null && !profileImage.isEmpty()) {
+            try {
                 if (user.getProfile() != null) {
-                    fileService.deleteFileFromS3(user.getProfile());
+                    fileService.deleteFileFromS3(user.getProfile()); // 기존 프로필 삭제
                 }
-                profileImageUrl = fileService.uploadUserProfileImageToS3(profileImage);
-            } else {
-                profileImageUrl = fileService.uploadDefaultProfileImageToS3();
+                String profileImageUrl = fileService.uploadUserProfileImageToS3(profileImage, user.getId());
+                user.setProfile(profileImageUrl);
+            } catch (IOException e) {
+                throw new RuntimeException("프로필 이미지 업로드 실패: " + e.getMessage(), e);
             }
-        } catch (IOException e) {
-            throw new RuntimeException("프로필 이미지 업로드 실패: " + e.getMessage(), e);
         }
-
-        user.setProfile(profileImageUrl);
         return userRepository.save(user);
     }
 
