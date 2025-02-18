@@ -25,4 +25,7 @@ public interface CommunityRepository extends JpaRepository<CommunityEntity, Long
     List<CommunityEntity> findByAuthorId(@Param("userId") Long userId);
 
     Page<CommunityEntity> findAll(Pageable pageable);
+
+    @Query("SELECT c FROM CommunityEntity c WHERE c.type LIKE %:type%")
+    Page<CommunityEntity> findByTypeContaining(@Param("type") String type, Pageable pageable);
 }
