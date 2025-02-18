@@ -20,15 +20,22 @@ public class UserService {
     private final FileService fileService;
 
     @Transactional
-    public User updateUserInfo(UserRequest userRequest) {
-        User user = userRepository.findById(userRequest.getId())
-                .orElseThrow(() -> new IllegalStateException("사용자 정보가 없습니다."));
+    public User updateUserInfo(UserRequest userRequest, Long id) {
+        System.out.println("=========================================================");
+        System.out.println("=========================================================");
+        System.out.println(userRequest);
+        System.out.println("=========================================================");
+        System.out.println("=========================================================");
+
+        User user = userRepository.findById(id).orElseThrow(() -> new IllegalStateException("사용자 정보가 없습니다."));
 
         user.setUsername(userRequest.getUsername());
-        user.setAge(userRequest.getAge());
+        //user.setAge(userRequest.getAge());
         user.setArea(userRequest.getArea());
         user.setGender(userRequest.getGender());
         user.setRole(UserRole.MEMBER);
+
+
 
         MultipartFile profileImage = userRequest.getProfileImage();
 

@@ -17,6 +17,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @Slf4j
@@ -77,6 +79,8 @@ public class SuccessHandler implements AuthenticationSuccessHandler {
 
         log.info("Access Token 및 Refresh Token 생성 완료: userId = {}, username = {}", user.getId(), user.getUsername());
 
+        String encodedName = URLEncoder.encode(user.getUsername(), StandardCharsets.UTF_8);
+
         // 클라이언트에 리다이렉트, 토큰 전달 (헤더로 전달)
         response.sendRedirect(String.format(
                 "%s?access_token=%s&refresh_token=%s&userid=%d&username=%s",
@@ -84,7 +88,7 @@ public class SuccessHandler implements AuthenticationSuccessHandler {
                 accessToken,
                 refreshToken,
                 user.getId(),
-                user.getUsername()
+                encodedName
         ));
     }
 

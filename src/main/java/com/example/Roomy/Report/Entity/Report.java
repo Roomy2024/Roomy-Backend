@@ -1,7 +1,6 @@
 package com.example.Roomy.Report.Entity;
 
 import com.example.Roomy.SocialLogin.Entity.User;
-import com.example.Roomy.SocialLogin.Entity.UserRole;
 import com.example.Roomy.comment.entity.CommentEntity;
 import com.example.Roomy.community.entity.CommunityEntity;
 import jakarta.persistence.*;
