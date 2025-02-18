@@ -39,7 +39,6 @@ public class Config {
                         // OAuth 관련 경로 허용
                         .requestMatchers("/oauth2/authorization/kakao").permitAll()
                         .requestMatchers("/auth/kakao/**").permitAll()
-                        .requestMatchers("/update-userinfo").permitAll()
                         // 기타 특정 경로 허용
                         .requestMatchers("/report/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -50,6 +49,7 @@ public class Config {
                         .requestMatchers("/likes/**").permitAll()
                         .requestMatchers("/onetoonechat/**").permitAll()
                         .requestMatchers("/bookmarks/**").permitAll()
+                        .requestMatchers("/update-userinfo").permitAll()
                         .requestMatchers("/api/**").permitAll()
                         .requestMatchers("/notifications/**").permitAll()
                         .requestMatchers("/mypage/**").permitAll()

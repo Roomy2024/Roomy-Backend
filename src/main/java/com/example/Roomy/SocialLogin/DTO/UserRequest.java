@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserRequest {
     private Long id;
     private String username;
-    private int age;
+    //private int age;
     private String area;
     private String gender;
     private MultipartFile profileImage;

@@ -15,14 +15,14 @@ public class MyPageController {
     private final JwtTokenProvider jwtTokenProvider;
     private final MyPageService myPageService;
 
-    @GetMapping("/mypage")
-    public ResponseEntity<?> mypage(@RequestHeader("Authorization") String token){
-
-        String jwtToken = token.replace("Bearer ", "");
-        Long userId = Long.parseLong(jwtTokenProvider.getUserIdFromToken(jwtToken));
-
-        UserDTO user = myPageService.ShowMyPage(userId);
-
-        return ResponseEntity.ok().body(user);
-    }
+//    @GetMapping("/mypage")
+//    public ResponseEntity<?> mypage(@RequestHeader("Authorization") String token){
+//
+//        String jwtToken = token.replace("Bearer ", "");
+//        Long userId = Long.parseLong(jwtTokenProvider.getUserIdFromToken(jwtToken));
+//
+//        UserDTO user = myPageService.ShowMyPage(userId);
+//
+//        return ResponseEntity.ok().body(user);
+//    }
 }

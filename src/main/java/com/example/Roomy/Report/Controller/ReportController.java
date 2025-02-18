@@ -2,10 +2,8 @@ package com.example.Roomy.Report.Controller;
 
 import com.example.Roomy.Report.DTO.ReportRequest;
 import com.example.Roomy.Report.Entity.ReportReason;
-import com.example.Roomy.Report.Repository.ReportRepository;
 import com.example.Roomy.Report.Service.ReportService;
 import com.example.Roomy.SocialLogin.JWT.JwtTokenProvider;
-import com.example.Roomy.SocialLogin.Repository.UserRepository;
 import com.example.Roomy.comment.repository.CommentRepository;
 import com.example.Roomy.community.dto.CommunityDTO;
 import com.example.Roomy.community.repository.CommunityRepository;
@@ -13,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
