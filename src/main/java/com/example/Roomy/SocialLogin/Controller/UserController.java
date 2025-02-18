@@ -21,6 +21,7 @@ public class UserController {
     private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping(value = "/update-userinfo")
+
     public ResponseEntity<String> updateUserInfo(@ModelAttribute UserRequest userRequest, @RequestHeader("Authorization") String token , HttpServletRequest Request) throws IOException {
         System.out.println(userRequest);
         System.out.println(Request.getHeader("Authorization"));

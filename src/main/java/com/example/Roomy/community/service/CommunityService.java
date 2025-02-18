@@ -12,7 +12,7 @@ public interface CommunityService {
     CommunityResponseDTO createCommunity(CommunityRequestDTO communityRequestDTO) throws IOException;
     CommunityResponseDTO updateCommunity(Long id, CommunityRequestDTO communityRequestDTO) throws IOException;
     CommunityResponseDTO getCommunity(Long id);
-    Page<CommunityResponseDTO> getAllCommunities(Pageable pageable); // ✅ 페이징 추가
+    Page<CommunityResponseDTO> getAllCommunities(String type, Pageable pageable);
     String deleteCommunity(Long id, Long userId);
     void increaseViewCount(Long id);
     List<CommunityResponseDTO> getMyCommunities(Long userId);

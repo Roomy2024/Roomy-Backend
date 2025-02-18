@@ -62,7 +62,7 @@ public class FileService {
             metadata.setContentType(file.getContentType());
 
             amazonS3.putObject(new PutObjectRequest(bucketName, keyName, file.getInputStream(), metadata));
-            
+
             fileUrl = amazonS3.getUrl(bucketName, keyName).toString();
         } catch (IOException e) {
             throw new IOException("파일 업로드 실패", e);

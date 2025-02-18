@@ -36,6 +36,7 @@ public class UserInfoUpdateService {
         return userRepository.save(user);
     }
 
+
     @Transactional
     public User updateUserName(Long id, String username){
         User user = userRepository.findById(id).orElseThrow(()->new IllegalStateException("사용자 정보가 없습니다."));

@@ -144,15 +144,25 @@ public class CommunityServiceImpl implements CommunityService {
     }
 
     @Override
-    public Page<CommunityResponseDTO> getAllCommunities(Pageable pageable) {
-        Page<CommunityEntity> communityPage = communityRepository.findAll(pageable);
+    public Page<CommunityResponseDTO> getAllCommunities(String type, Pageable pageable) {
+        Page<CommunityEntity> communityPage;
+
+        // ✅ "전체"가 입력되면 모든 게시글 조회
+        if (type == null || type.isEmpty() || type.equals("전체")) {
+            communityPage = communityRepository.findAll(pageable);
+        } else {
+            // ✅ type이 포함된 게시글 조회 (LIKE 검색)
+            communityPage = communityRepository.findByTypeContaining(type, pageable);
+        }
 
         List<CommunityResponseDTO> communityResponseDTOList = communityPage.getContent().stream()
-                .map(community -> toResponseDTO(community, getTotalCommentCount(community.getCommunityId()))) // ✅ 람다식 사용
+                .map(community -> toResponseDTO(community, getTotalCommentCount(community.getCommunityId())))
                 .collect(Collectors.toList());
 
         return new PageImpl<>(communityResponseDTOList, pageable, communityPage.getTotalElements());
     }
+
+
 
 
 
