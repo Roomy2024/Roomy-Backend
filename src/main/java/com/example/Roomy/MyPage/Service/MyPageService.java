@@ -12,18 +12,18 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MyPageService {
     private final UserRepository userRepository;
-
-    @Transactional
-    public UserDTO ShowMyPage(Long id){
-        User user = userRepository.findById(id).orElseThrow(()->new IllegalStateException("사용자 정보가 없습니다."));
-
-        return new UserDTO(
-                user.getUsername(),
-                user.getEmail(),
-                user.getArea(),
-                user.getGender(),
-                user.getAge(),
-                user.getProfile()
-                );
-    }
+//
+//    @Transactional
+//    public UserDTO ShowMyPage(Long id){
+//        User user = userRepository.findById(id).orElseThrow(()->new IllegalStateException("사용자 정보가 없습니다."));
+//
+//        return new UserDTO(
+//                user.getUsername(),
+//                user.getEmail(),
+//                user.getArea(),
+//                user.getGender(),
+//                //user.getAge(),
+//                user.getProfile()
+//                );
+//    }
 }

@@ -34,7 +34,7 @@ public class User {
 
     private String area;
     private String gender;
-    private int age;
+    //private int age;
     private String profile;
 
     private String refreshToken;
