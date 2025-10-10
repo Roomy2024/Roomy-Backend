@@ -24,11 +24,12 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testImplementation 'com.h2database:h2'
 
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
 	implementation group: 'com.mysql', name: 'mysql-connector-j', version: '8.0.32'
 //	implementation 'mysql:mysql-connector-java:8.0.33'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
